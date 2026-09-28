@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/Services/" />
+  <Folder Name="/Services/Catalog/">
+    <Project Path="src/services/Catalog/YellowCola.Catalog.Api/YellowCola.Catalog.Api.csproj" />
+    <Project Path="src/services/Catalog/YellowCola.Catalog.Application/YellowCola.Catalog.Application.csproj" />
+    <Project Path="src/services/Catalog/YellowCola.Catalog.Domain/YellowCola.Catalog.Domain.csproj" />
+    <Project Path="src/services/Catalog/YellowCola.Catalog.Infrastructure/YellowCola.Catalog.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Tests/" />
+  <Folder Name="/Tests/Catalog/">
+    <Project Path="tests/Catalog/YellowCola.Catalog.UnitTests/YellowCola.Catalog.UnitTests.csproj" />
+  </Folder>
+</Solution>

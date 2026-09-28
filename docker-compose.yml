@@ -1,0 +1,50 @@
+services:
+
+  postgres:
+    image: postgres:18-alpine
+    container_name: yc-postgres
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: postgres
+
+    ports:
+      - "${POSTGRES_PORT}:5432"
+
+    volumes:
+      - yc-postgres-data:/var/lib/postgresql
+      - ./infra/local/postgres/init:/docker-entrypoint-initdb.d:ro
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER} -d postgres"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+
+  redis:
+    image: redis:8-alpine
+    container_name: yc-redis
+
+    ports:
+      - "${REDIS_PORT}:6379"
+
+    volumes:
+      - yc-redis-data:/data
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+
+volumes:
+
+  yc-postgres-data:
+  yc-redis-data:
