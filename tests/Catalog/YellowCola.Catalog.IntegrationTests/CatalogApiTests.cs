@@ -58,9 +58,6 @@ public sealed class CatalogApiTests : IAsyncLifetime, IDisposable
 
     public async Task DisposeAsync()
     {
-        _client?.Dispose();
-        _factory?.Dispose();
-
         await _postgres.DisposeAsync();
     }
     public void Dispose()
