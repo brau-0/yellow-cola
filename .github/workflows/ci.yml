@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 15
+
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.401'
+
+      - name: Show .NET information
+        run: dotnet --info
+
+      - name: Restore
+        run: dotnet restore YellowCola.slnx
+
+      - name: Build
+        run: >
+          dotnet build YellowCola.slnx
+          --configuration Release
+          --no-restore
+
+      - name: Run unit tests
+        run: >
+          dotnet test
+          tests/Catalog/YellowCola.Catalog.UnitTests/YellowCola.Catalog.UnitTests.csproj
+          --configuration Release
+          --no-build
+
+      - name: Run integration tests
+        run: >
+          dotnet test
+          tests/Catalog/YellowCola.Catalog.IntegrationTests/YellowCola.Catalog.IntegrationTests.csproj
+          --configuration Release
+          --no-build
