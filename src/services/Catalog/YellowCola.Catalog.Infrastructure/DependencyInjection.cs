@@ -12,22 +12,27 @@ namespace YellowCola.Catalog.Infrastructure;
 public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(
-        this IServiceCollection services,
-        IConfiguration configuration)
+        this IServiceCollection services)
     {
-        var connectionString =
-            configuration.GetConnectionString("CatalogDatabase")
-            ?? throw new InvalidOperationException(
-                "Connection string 'CatalogDatabase' was not found.");
-
         services.AddDbContext<CatalogDbContext>(
-            options =>
+            (serviceProvider, options) =>
             {
+                var configuration =
+                    serviceProvider
+                        .GetRequiredService<IConfiguration>();
+
+                var connectionString =
+                    configuration.GetConnectionString(
+                        "CatalogDatabase")
+                    ?? throw new InvalidOperationException(
+                        "Connection string 'CatalogDatabase' was not found.");
+
                 options.UseNpgsql(connectionString);
             });
 
         services.AddScoped<ICatalogQueries, CatalogQueries>();
         services.AddScoped<CatalogSeeder>();
+
         return services;
     }
 }
