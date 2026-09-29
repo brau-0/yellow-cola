@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\YellowCola.Catalog.Application\YellowCola.Catalog.Application.csproj" />
-    <ProjectReference Include="..\YellowCola.Catalog.Domain\YellowCola.Catalog.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.12">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\YellowCola.Catalog.Application\YellowCola.Catalog.Application.csproj" />
+    <ProjectReference Include="..\YellowCola.Catalog.Domain\YellowCola.Catalog.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,3 +1,4 @@
+using YellowCola.Catalog.Api.Endpoints;
 using YellowCola.Catalog.Infrastructure;
 using YellowCola.Catalog.Infrastructure.Seed;
 
@@ -35,6 +36,8 @@ app.MapGet("/health", () =>
         status = "healthy"
     });
 });
+
+app.MapCatalogEndpoints();
 
 app.Run();
 
