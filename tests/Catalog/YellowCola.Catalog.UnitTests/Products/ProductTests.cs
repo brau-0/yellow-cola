@@ -15,20 +15,25 @@ public sealed class ProductTests
 
         var product = new Product(
             productId,
+            "YC-P001",
             Guid.NewGuid(),
             "Yellow Cola",
             "Yellow Cola Original",
             "yellow-cola-original",
-            "Classic Yellow Cola.");
+            "Cola clásica.",
+            "Cola clásica con perfil caramelizado.",
+            "yc-p001-main");
 
         var sku = new Sku(
             Guid.NewGuid(),
             productId,
             "YC-ORI-355-CAN-06",
+            "ORI",
             355,
             "CAN",
             6,
-            89.90m);
+            "6 x 355 ml",
+            72m);
 
         product.AddSku(sku);
 
@@ -41,31 +46,38 @@ public sealed class ProductTests
         var productId = Guid.NewGuid();
 
         var product = new Product(
-            productId,
-            Guid.NewGuid(),
-            "Yellow Cola",
-            "Yellow Cola Original",
-            "yellow-cola-original",
-            "Classic Yellow Cola.");
+             productId,
+             "YC-P001",
+             Guid.NewGuid(),
+             "Yellow Cola",
+             "Yellow Cola Original",
+             "yellow-cola-original",
+             "Cola clásica.",
+             "Cola clásica con perfil caramelizado.",
+             "yc-p001-main");
 
         product.AddSku(
             new Sku(
                 Guid.NewGuid(),
                 productId,
                 "YC-ORI-355-CAN-06",
+                "ORI",
                 355,
                 "CAN",
                 6,
-                89.90m));
+                "6 x 355 ml",
+                72m));
 
         var duplicatedSku = new Sku(
             Guid.NewGuid(),
             productId,
-            "yc-ori-355-can-06",
+            "YC-ORI-355-CAN-06",
+            "ORI",
             355,
             "CAN",
             6,
-            89.90m);
+            "6 x 355 ml",
+            72m);
 
         var exception = Assert.Throws<InvalidOperationException>(
             () => product.AddSku(duplicatedSku));
@@ -78,14 +90,17 @@ public sealed class ProductTests
     [Fact]
     public void ChangePriceShouldRejectNegativePrice()
     {
+        var productId = Guid.NewGuid();
         var sku = new Sku(
             Guid.NewGuid(),
-            Guid.NewGuid(),
+            productId,
             "YC-ORI-355-CAN-06",
+            "ORI",
             355,
             "CAN",
             6,
-            89.90m);
+            "6 x 355 ml",
+            72m);
 
         Assert.Throws<ArgumentOutOfRangeException>(
             () => sku.ChangePrice(-1m));

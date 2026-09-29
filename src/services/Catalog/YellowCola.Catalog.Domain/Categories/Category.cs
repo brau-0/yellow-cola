@@ -9,7 +9,8 @@
         public Category(
             Guid id,
             string name,
-            string slug)
+            string slug,
+            Guid? parentId = null)
         {
             if (id == Guid.Empty)
             {
@@ -35,10 +36,13 @@
             Id = id;
             Name = name.Trim();
             Slug = slug.Trim().ToLowerInvariant();
+            ParentId = parentId;
             IsActive = true;
         }
 
         public Guid Id { get; private set; }
+
+        public Guid? ParentId { get; private set; }
 
         public string Name { get; private set; } = string.Empty;
 
@@ -58,14 +62,8 @@
             Name = name.Trim();
         }
 
-        public void Activate()
-        {
-            IsActive = true;
-        }
+        public void Activate() => IsActive = true;
 
-        public void Deactivate()
-        {
-            IsActive = false;
-        }
+        public void Deactivate() => IsActive = false;
     }
 }

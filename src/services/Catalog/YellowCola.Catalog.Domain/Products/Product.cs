@@ -2,6 +2,9 @@
 
 public sealed class Product
 {
+    public string Code { get; private set; } = string.Empty;
+    public string ShortDescription { get; private set; } = string.Empty;
+    public string PrimaryImageKey { get; private set; } = string.Empty;
     private readonly List<Sku> _skus = [];
 
     private Product()
@@ -9,18 +12,28 @@ public sealed class Product
     }
 
     public Product(
-        Guid id,
-        Guid categoryId,
-        string brand,
-        string name,
-        string slug,
-        string description)
+    Guid id,
+    string code,
+    Guid categoryId,
+    string brand,
+    string name,
+    string slug,
+    string shortDescription,
+    string description,
+    string primaryImageKey)
     {
         if (id == Guid.Empty)
         {
             throw new ArgumentException(
                 "Product id cannot be empty.",
                 nameof(id));
+        }
+
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            throw new ArgumentException(
+                "Product code is required.",
+                nameof(code));
         }
 
         if (categoryId == Guid.Empty)
@@ -52,11 +65,14 @@ public sealed class Product
         }
 
         Id = id;
+        Code = code.Trim().ToUpperInvariant();
         CategoryId = categoryId;
         Brand = brand.Trim();
         Name = name.Trim();
         Slug = slug.Trim().ToLowerInvariant();
+        ShortDescription = shortDescription.Trim();
         Description = description.Trim();
+        PrimaryImageKey = primaryImageKey.Trim();
         IsActive = true;
     }
 

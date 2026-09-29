@@ -49,6 +49,21 @@ internal sealed class SkuConfiguration
             .HasColumnName("is_active")
             .IsRequired();
 
+        builder.Property(x => x.Flavor)
+            .HasColumnName("flavor")
+            .HasMaxLength(30)
+            .IsRequired();
+
+        builder.Property(x => x.PackLabel)
+            .HasColumnName("pack_label")
+            .HasMaxLength(50)
+            .IsRequired();
+
+        builder.Property(x => x.Currency)
+            .HasColumnName("currency")
+            .HasMaxLength(3)
+            .IsRequired();
+
         builder.HasIndex(x => x.Code)
             .IsUnique();
     }

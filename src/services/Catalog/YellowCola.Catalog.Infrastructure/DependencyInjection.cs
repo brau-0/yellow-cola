@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using YellowCola.Catalog.Infrastructure.Persistence;
+using YellowCola.Catalog.Infrastructure.Seed;
 
 namespace YellowCola.Catalog.Infrastructure;
 
@@ -23,6 +24,7 @@ public static class DependencyInjection
                 options.UseNpgsql(connectionString);
             });
 
+        services.AddScoped<CatalogSeeder>();
         return services;
     }
 }

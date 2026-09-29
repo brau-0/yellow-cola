@@ -1,0 +1,830 @@
+{
+  "categories": [
+    {
+      "name": "Refrescos",
+      "slug": "refrescos",
+      "parentSlug": null
+    },
+    {
+      "name": "Agua",
+      "slug": "agua",
+      "parentSlug": null
+    },
+    {
+      "name": "Jugos y Néctares",
+      "slug": "jugos-y-nectares",
+      "parentSlug": null
+    },
+    {
+      "name": "Lácteos",
+      "slug": "lacteos",
+      "parentSlug": null
+    },
+    {
+      "name": "Cola",
+      "slug": "cola",
+      "parentSlug": "refrescos"
+    },
+    {
+      "name": "Sabores",
+      "slug": "sabores",
+      "parentSlug": "refrescos"
+    },
+    {
+      "name": "Natural",
+      "slug": "natural",
+      "parentSlug": "agua"
+    },
+    {
+      "name": "Mineral / Gasificada",
+      "slug": "mineral-gasificada",
+      "parentSlug": "agua"
+    },
+    {
+      "name": "Jugos",
+      "slug": "jugos",
+      "parentSlug": "jugos-y-nectares"
+    },
+    {
+      "name": "Néctares",
+      "slug": "nectares",
+      "parentSlug": "jugos-y-nectares"
+    },
+    {
+      "name": "Leche",
+      "slug": "leche",
+      "parentSlug": "lacteos"
+    },
+    {
+      "name": "Bebidas saborizadas",
+      "slug": "bebidas-saborizadas",
+      "parentSlug": "lacteos"
+    }
+  ],
+  "products": [
+    {
+      "productId": "YC-P001",
+      "brand": "Yellow Cola",
+      "name": "Yellow Cola Original",
+      "slug": "yellow-cola-original",
+      "categoryLevel1": "refrescos",
+      "categoryLevel2": "cola",
+      "shortDescription": "Cola clásica con perfil caramelizado y final limpio.",
+      "description": "Cola clásica con perfil caramelizado y final limpio. Producto ficticio para la POC Yellow Cola.",
+      "primaryImageKey": "yc-p001-main",
+      "skus": [
+        {
+          "sku": "YC-ORI-355-CAN-06",
+          "flavor": "ORI",
+          "volumeMl": 355,
+          "containerType": "CAN",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 355 ml",
+          "priceMxn": 72
+        },
+        {
+          "sku": "YC-ORI-355-CAN-12",
+          "flavor": "ORI",
+          "volumeMl": 355,
+          "containerType": "CAN",
+          "unitsPerPack": 12,
+          "packLabel": "12 x 355 ml",
+          "priceMxn": 135
+        },
+        {
+          "sku": "YC-ORI-600-PET-06",
+          "flavor": "ORI",
+          "volumeMl": 600,
+          "containerType": "PET",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 600 ml",
+          "priceMxn": 108
+        },
+        {
+          "sku": "YC-ORI-2000-PET-01",
+          "flavor": "ORI",
+          "volumeMl": 2000,
+          "containerType": "PET",
+          "unitsPerPack": 1,
+          "packLabel": "2000 ml",
+          "priceMxn": 38
+        }
+      ]
+    },
+    {
+      "productId": "YC-P002",
+      "brand": "Yellow Cola",
+      "name": "Yellow Cola Zero",
+      "slug": "yellow-cola-zero",
+      "categoryLevel1": "refrescos",
+      "categoryLevel2": "cola",
+      "shortDescription": "Cola sin azúcar con sabor intenso y refrescante.",
+      "description": "Cola sin azúcar con sabor intenso y refrescante. Producto ficticio para la POC Yellow Cola.",
+      "primaryImageKey": "yc-p002-main",
+      "skus": [
+        {
+          "sku": "YC-ZERO-355-CAN-06",
+          "flavor": "ZERO",
+          "volumeMl": 355,
+          "containerType": "CAN",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 355 ml",
+          "priceMxn": 74
+        },
+        {
+          "sku": "YC-ZERO-355-CAN-12",
+          "flavor": "ZERO",
+          "volumeMl": 355,
+          "containerType": "CAN",
+          "unitsPerPack": 12,
+          "packLabel": "12 x 355 ml",
+          "priceMxn": 138
+        },
+        {
+          "sku": "YC-ZERO-600-PET-06",
+          "flavor": "ZERO",
+          "volumeMl": 600,
+          "containerType": "PET",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 600 ml",
+          "priceMxn": 110
+        },
+        {
+          "sku": "YC-ZERO-2000-PET-01",
+          "flavor": "ZERO",
+          "volumeMl": 2000,
+          "containerType": "PET",
+          "unitsPerPack": 1,
+          "packLabel": "2000 ml",
+          "priceMxn": 39
+        }
+      ]
+    },
+    {
+      "productId": "YC-P003",
+      "brand": "Yellow Cola",
+      "name": "Yellow Cola Cherry",
+      "slug": "yellow-cola-cherry",
+      "categoryLevel1": "refrescos",
+      "categoryLevel2": "cola",
+      "shortDescription": "Cola con notas de cereza y acabado ligeramente frutal.",
+      "description": "Cola con notas de cereza y acabado ligeramente frutal. Producto ficticio para la POC Yellow Cola.",
+      "primaryImageKey": "yc-p003-main",
+      "skus": [
+        {
+          "sku": "YC-CHER-355-CAN-06",
+          "flavor": "CHER",
+          "volumeMl": 355,
+          "containerType": "CAN",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 355 ml",
+          "priceMxn": 76
+        },
+        {
+          "sku": "YC-CHER-355-CAN-12",
+          "flavor": "CHER",
+          "volumeMl": 355,
+          "containerType": "CAN",
+          "unitsPerPack": 12,
+          "packLabel": "12 x 355 ml",
+          "priceMxn": 141
+        },
+        {
+          "sku": "YC-CHER-600-PET-06",
+          "flavor": "CHER",
+          "volumeMl": 600,
+          "containerType": "PET",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 600 ml",
+          "priceMxn": 112
+        },
+        {
+          "sku": "YC-CHER-2000-PET-01",
+          "flavor": "CHER",
+          "volumeMl": 2000,
+          "containerType": "PET",
+          "unitsPerPack": 1,
+          "packLabel": "2000 ml",
+          "priceMxn": 40
+        }
+      ]
+    },
+    {
+      "productId": "YC-P004",
+      "brand": "Yellow Cola",
+      "name": "Yellow Cola Vanilla",
+      "slug": "yellow-cola-vanilla",
+      "categoryLevel1": "refrescos",
+      "categoryLevel2": "cola",
+      "shortDescription": "Cola con notas suaves de vainilla y caramelo.",
+      "description": "Cola con notas suaves de vainilla y caramelo. Producto ficticio para la POC Yellow Cola.",
+      "primaryImageKey": "yc-p004-main",
+      "skus": [
+        {
+          "sku": "YC-VAN-355-CAN-06",
+          "flavor": "VAN",
+          "volumeMl": 355,
+          "containerType": "CAN",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 355 ml",
+          "priceMxn": 78
+        },
+        {
+          "sku": "YC-VAN-355-CAN-12",
+          "flavor": "VAN",
+          "volumeMl": 355,
+          "containerType": "CAN",
+          "unitsPerPack": 12,
+          "packLabel": "12 x 355 ml",
+          "priceMxn": 144
+        },
+        {
+          "sku": "YC-VAN-600-PET-06",
+          "flavor": "VAN",
+          "volumeMl": 600,
+          "containerType": "PET",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 600 ml",
+          "priceMxn": 114
+        },
+        {
+          "sku": "YC-VAN-2000-PET-01",
+          "flavor": "VAN",
+          "volumeMl": 2000,
+          "containerType": "PET",
+          "unitsPerPack": 1,
+          "packLabel": "2000 ml",
+          "priceMxn": 41
+        }
+      ]
+    },
+    {
+      "productId": "YC-P005",
+      "brand": "Sunny",
+      "name": "Sunny Orange",
+      "slug": "sunny-orange",
+      "categoryLevel1": "refrescos",
+      "categoryLevel2": "sabores",
+      "shortDescription": "Refresco de naranja brillante y cítrico.",
+      "description": "Refresco de naranja brillante y cítrico. Producto ficticio para la POC Yellow Cola.",
+      "primaryImageKey": "yc-p005-main",
+      "skus": [
+        {
+          "sku": "SU-ORA-355-CAN-06",
+          "flavor": "ORA",
+          "volumeMl": 355,
+          "containerType": "CAN",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 355 ml",
+          "priceMxn": 68
+        },
+        {
+          "sku": "SU-ORA-600-PET-06",
+          "flavor": "ORA",
+          "volumeMl": 600,
+          "containerType": "PET",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 600 ml",
+          "priceMxn": 101
+        },
+        {
+          "sku": "SU-ORA-2000-PET-01",
+          "flavor": "ORA",
+          "volumeMl": 2000,
+          "containerType": "PET",
+          "unitsPerPack": 1,
+          "packLabel": "2000 ml",
+          "priceMxn": 35
+        }
+      ]
+    },
+    {
+      "productId": "YC-P006",
+      "brand": "Sunny",
+      "name": "Sunny Lemon-Lime",
+      "slug": "sunny-lemon-lime",
+      "categoryLevel1": "refrescos",
+      "categoryLevel2": "sabores",
+      "shortDescription": "Refresco cítrico de limón y lima.",
+      "description": "Refresco cítrico de limón y lima. Producto ficticio para la POC Yellow Cola.",
+      "primaryImageKey": "yc-p006-main",
+      "skus": [
+        {
+          "sku": "SU-LL-355-CAN-06",
+          "flavor": "LL",
+          "volumeMl": 355,
+          "containerType": "CAN",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 355 ml",
+          "priceMxn": 70
+        },
+        {
+          "sku": "SU-LL-600-PET-06",
+          "flavor": "LL",
+          "volumeMl": 600,
+          "containerType": "PET",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 600 ml",
+          "priceMxn": 103
+        },
+        {
+          "sku": "SU-LL-2000-PET-01",
+          "flavor": "LL",
+          "volumeMl": 2000,
+          "containerType": "PET",
+          "unitsPerPack": 1,
+          "packLabel": "2000 ml",
+          "priceMxn": 36
+        }
+      ]
+    },
+    {
+      "productId": "YC-P007",
+      "brand": "Sunny",
+      "name": "Sunny Grape",
+      "slug": "sunny-grape",
+      "categoryLevel1": "refrescos",
+      "categoryLevel2": "sabores",
+      "shortDescription": "Refresco sabor uva de perfil dulce y aromático.",
+      "description": "Refresco sabor uva de perfil dulce y aromático. Producto ficticio para la POC Yellow Cola.",
+      "primaryImageKey": "yc-p007-main",
+      "skus": [
+        {
+          "sku": "SU-GRP-355-CAN-06",
+          "flavor": "GRP",
+          "volumeMl": 355,
+          "containerType": "CAN",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 355 ml",
+          "priceMxn": 72
+        },
+        {
+          "sku": "SU-GRP-600-PET-06",
+          "flavor": "GRP",
+          "volumeMl": 600,
+          "containerType": "PET",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 600 ml",
+          "priceMxn": 105
+        },
+        {
+          "sku": "SU-GRP-2000-PET-01",
+          "flavor": "GRP",
+          "volumeMl": 2000,
+          "containerType": "PET",
+          "unitsPerPack": 1,
+          "packLabel": "2000 ml",
+          "priceMxn": 37
+        }
+      ]
+    },
+    {
+      "productId": "YC-P008",
+      "brand": "Sunny",
+      "name": "Sunny Apple",
+      "slug": "sunny-apple",
+      "categoryLevel1": "refrescos",
+      "categoryLevel2": "sabores",
+      "shortDescription": "Refresco de manzana con notas frescas y ligeramente ácidas.",
+      "description": "Refresco de manzana con notas frescas y ligeramente ácidas. Producto ficticio para la POC Yellow Cola.",
+      "primaryImageKey": "yc-p008-main",
+      "skus": [
+        {
+          "sku": "SU-APP-355-CAN-06",
+          "flavor": "APP",
+          "volumeMl": 355,
+          "containerType": "CAN",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 355 ml",
+          "priceMxn": 74
+        },
+        {
+          "sku": "SU-APP-600-PET-06",
+          "flavor": "APP",
+          "volumeMl": 600,
+          "containerType": "PET",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 600 ml",
+          "priceMxn": 107
+        },
+        {
+          "sku": "SU-APP-2000-PET-01",
+          "flavor": "APP",
+          "volumeMl": 2000,
+          "containerType": "PET",
+          "unitsPerPack": 1,
+          "packLabel": "2000 ml",
+          "priceMxn": 38
+        }
+      ]
+    },
+    {
+      "productId": "YC-P009",
+      "brand": "ClearDrop",
+      "name": "ClearDrop Natural",
+      "slug": "cleardrop-natural",
+      "categoryLevel1": "agua",
+      "categoryLevel2": "natural",
+      "shortDescription": "Agua purificada de sabor neutro para consumo diario.",
+      "description": "Agua purificada de sabor neutro para consumo diario. Producto ficticio para la POC Yellow Cola.",
+      "primaryImageKey": "yc-p009-main",
+      "skus": [
+        {
+          "sku": "CD-NAT-600-PET-12",
+          "flavor": "NAT",
+          "volumeMl": 600,
+          "containerType": "PET",
+          "unitsPerPack": 12,
+          "packLabel": "12 x 600 ml",
+          "priceMxn": 105
+        },
+        {
+          "sku": "CD-NAT-1000-PET-06",
+          "flavor": "NAT",
+          "volumeMl": 1000,
+          "containerType": "PET",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 1000 ml",
+          "priceMxn": 72
+        },
+        {
+          "sku": "CD-NAT-1500-PET-06",
+          "flavor": "NAT",
+          "volumeMl": 1500,
+          "containerType": "PET",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 1500 ml",
+          "priceMxn": 89
+        }
+      ]
+    },
+    {
+      "productId": "YC-P010",
+      "brand": "ClearDrop",
+      "name": "ClearDrop Sparkling",
+      "slug": "cleardrop-sparkling",
+      "categoryLevel1": "agua",
+      "categoryLevel2": "mineral-gasificada",
+      "shortDescription": "Agua gasificada de burbuja fina.",
+      "description": "Agua gasificada de burbuja fina. Producto ficticio para la POC Yellow Cola.",
+      "primaryImageKey": "yc-p010-main",
+      "skus": [
+        {
+          "sku": "CD-SPK-355-CAN-06",
+          "flavor": "SPK",
+          "volumeMl": 355,
+          "containerType": "CAN",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 355 ml",
+          "priceMxn": 78
+        },
+        {
+          "sku": "CD-SPK-355-CAN-12",
+          "flavor": "SPK",
+          "volumeMl": 355,
+          "containerType": "CAN",
+          "unitsPerPack": 12,
+          "packLabel": "12 x 355 ml",
+          "priceMxn": 148
+        },
+        {
+          "sku": "CD-SPK-600-PET-06",
+          "flavor": "SPK",
+          "volumeMl": 600,
+          "containerType": "PET",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 600 ml",
+          "priceMxn": 112
+        }
+      ]
+    },
+    {
+      "productId": "YC-P011",
+      "brand": "ClearDrop",
+      "name": "ClearDrop Lemon Sparkling",
+      "slug": "cleardrop-lemon-sparkling",
+      "categoryLevel1": "agua",
+      "categoryLevel2": "mineral-gasificada",
+      "shortDescription": "Agua gasificada con notas naturales de limón.",
+      "description": "Agua gasificada con notas naturales de limón. Producto ficticio para la POC Yellow Cola.",
+      "primaryImageKey": "yc-p011-main",
+      "skus": [
+        {
+          "sku": "CD-LEM-355-CAN-06",
+          "flavor": "LEM",
+          "volumeMl": 355,
+          "containerType": "CAN",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 355 ml",
+          "priceMxn": 80
+        },
+        {
+          "sku": "CD-LEM-355-CAN-12",
+          "flavor": "LEM",
+          "volumeMl": 355,
+          "containerType": "CAN",
+          "unitsPerPack": 12,
+          "packLabel": "12 x 355 ml",
+          "priceMxn": 151
+        },
+        {
+          "sku": "CD-LEM-600-PET-06",
+          "flavor": "LEM",
+          "volumeMl": 600,
+          "containerType": "PET",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 600 ml",
+          "priceMxn": 114
+        }
+      ]
+    },
+    {
+      "productId": "YC-P012",
+      "brand": "ClearDrop",
+      "name": "ClearDrop Berry Sparkling",
+      "slug": "cleardrop-berry-sparkling",
+      "categoryLevel1": "agua",
+      "categoryLevel2": "mineral-gasificada",
+      "shortDescription": "Agua gasificada con notas de frutos rojos.",
+      "description": "Agua gasificada con notas de frutos rojos. Producto ficticio para la POC Yellow Cola.",
+      "primaryImageKey": "yc-p012-main",
+      "skus": [
+        {
+          "sku": "CD-BER-355-CAN-06",
+          "flavor": "BER",
+          "volumeMl": 355,
+          "containerType": "CAN",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 355 ml",
+          "priceMxn": 82
+        },
+        {
+          "sku": "CD-BER-355-CAN-12",
+          "flavor": "BER",
+          "volumeMl": 355,
+          "containerType": "CAN",
+          "unitsPerPack": 12,
+          "packLabel": "12 x 355 ml",
+          "priceMxn": 154
+        },
+        {
+          "sku": "CD-BER-600-PET-06",
+          "flavor": "BER",
+          "volumeMl": 600,
+          "containerType": "PET",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 600 ml",
+          "priceMxn": 116
+        }
+      ]
+    },
+    {
+      "productId": "YC-P013",
+      "brand": "Valley",
+      "name": "Valley Apple",
+      "slug": "valley-apple",
+      "categoryLevel1": "jugos-y-nectares",
+      "categoryLevel2": "jugos",
+      "shortDescription": "Bebida de manzana de sabor fresco y ligero.",
+      "description": "Bebida de manzana de sabor fresco y ligero. Producto ficticio para la POC Yellow Cola.",
+      "primaryImageKey": "yc-p013-main",
+      "skus": [
+        {
+          "sku": "VA-APP-250-TETRA-06",
+          "flavor": "APP",
+          "volumeMl": 250,
+          "containerType": "TETRA",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 250 ml",
+          "priceMxn": 69
+        },
+        {
+          "sku": "VA-APP-1000-TETRA-01",
+          "flavor": "APP",
+          "volumeMl": 1000,
+          "containerType": "TETRA",
+          "unitsPerPack": 1,
+          "packLabel": "1000 ml",
+          "priceMxn": 38
+        }
+      ]
+    },
+    {
+      "productId": "YC-P014",
+      "brand": "Valley",
+      "name": "Valley Orange",
+      "slug": "valley-orange",
+      "categoryLevel1": "jugos-y-nectares",
+      "categoryLevel2": "jugos",
+      "shortDescription": "Bebida de naranja con perfil cítrico.",
+      "description": "Bebida de naranja con perfil cítrico. Producto ficticio para la POC Yellow Cola.",
+      "primaryImageKey": "yc-p014-main",
+      "skus": [
+        {
+          "sku": "VA-ORA-250-TETRA-06",
+          "flavor": "ORA",
+          "volumeMl": 250,
+          "containerType": "TETRA",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 250 ml",
+          "priceMxn": 72
+        },
+        {
+          "sku": "VA-ORA-1000-TETRA-01",
+          "flavor": "ORA",
+          "volumeMl": 1000,
+          "containerType": "TETRA",
+          "unitsPerPack": 1,
+          "packLabel": "1000 ml",
+          "priceMxn": 40
+        }
+      ]
+    },
+    {
+      "productId": "YC-P015",
+      "brand": "Valley",
+      "name": "Valley Mango",
+      "slug": "valley-mango",
+      "categoryLevel1": "jugos-y-nectares",
+      "categoryLevel2": "nectares",
+      "shortDescription": "Néctar de mango de textura suave.",
+      "description": "Néctar de mango de textura suave. Producto ficticio para la POC Yellow Cola.",
+      "primaryImageKey": "yc-p015-main",
+      "skus": [
+        {
+          "sku": "VA-MAN-250-TETRA-06",
+          "flavor": "MAN",
+          "volumeMl": 250,
+          "containerType": "TETRA",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 250 ml",
+          "priceMxn": 75
+        },
+        {
+          "sku": "VA-MAN-1000-TETRA-01",
+          "flavor": "MAN",
+          "volumeMl": 1000,
+          "containerType": "TETRA",
+          "unitsPerPack": 1,
+          "packLabel": "1000 ml",
+          "priceMxn": 42
+        }
+      ]
+    },
+    {
+      "productId": "YC-P016",
+      "brand": "Valley",
+      "name": "Valley Peach",
+      "slug": "valley-peach",
+      "categoryLevel1": "jugos-y-nectares",
+      "categoryLevel2": "nectares",
+      "shortDescription": "Néctar de durazno con sabor redondo y frutal.",
+      "description": "Néctar de durazno con sabor redondo y frutal. Producto ficticio para la POC Yellow Cola.",
+      "primaryImageKey": "yc-p016-main",
+      "skus": [
+        {
+          "sku": "VA-PEA-250-TETRA-06",
+          "flavor": "PEA",
+          "volumeMl": 250,
+          "containerType": "TETRA",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 250 ml",
+          "priceMxn": 78
+        },
+        {
+          "sku": "VA-PEA-1000-TETRA-01",
+          "flavor": "PEA",
+          "volumeMl": 1000,
+          "containerType": "TETRA",
+          "unitsPerPack": 1,
+          "packLabel": "1000 ml",
+          "priceMxn": 44
+        }
+      ]
+    },
+    {
+      "productId": "YC-P017",
+      "brand": "Morning Moo",
+      "name": "Morning Moo Whole",
+      "slug": "morning-moo-whole",
+      "categoryLevel1": "lacteos",
+      "categoryLevel2": "leche",
+      "shortDescription": "Leche entera UHT para consumo diario.",
+      "description": "Leche entera UHT para consumo diario. Producto ficticio para la POC Yellow Cola.",
+      "primaryImageKey": "yc-p017-main",
+      "skus": [
+        {
+          "sku": "MM-WHOLE-250-TETRA-06",
+          "flavor": "WHOLE",
+          "volumeMl": 250,
+          "containerType": "TETRA",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 250 ml",
+          "priceMxn": 82
+        },
+        {
+          "sku": "MM-WHOLE-1000-TETRA-01",
+          "flavor": "WHOLE",
+          "volumeMl": 1000,
+          "containerType": "TETRA",
+          "unitsPerPack": 1,
+          "packLabel": "1000 ml",
+          "priceMxn": 39
+        }
+      ]
+    },
+    {
+      "productId": "YC-P018",
+      "brand": "Morning Moo",
+      "name": "Morning Moo Light",
+      "slug": "morning-moo-light",
+      "categoryLevel1": "lacteos",
+      "categoryLevel2": "leche",
+      "shortDescription": "Leche reducida en grasa UHT.",
+      "description": "Leche reducida en grasa UHT. Producto ficticio para la POC Yellow Cola.",
+      "primaryImageKey": "yc-p018-main",
+      "skus": [
+        {
+          "sku": "MM-LIGHT-250-TETRA-06",
+          "flavor": "LIGHT",
+          "volumeMl": 250,
+          "containerType": "TETRA",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 250 ml",
+          "priceMxn": 86
+        },
+        {
+          "sku": "MM-LIGHT-1000-TETRA-01",
+          "flavor": "LIGHT",
+          "volumeMl": 1000,
+          "containerType": "TETRA",
+          "unitsPerPack": 1,
+          "packLabel": "1000 ml",
+          "priceMxn": 41
+        }
+      ]
+    },
+    {
+      "productId": "YC-P019",
+      "brand": "Morning Moo",
+      "name": "Morning Moo Chocolate",
+      "slug": "morning-moo-chocolate",
+      "categoryLevel1": "lacteos",
+      "categoryLevel2": "bebidas-saborizadas",
+      "shortDescription": "Bebida láctea sabor chocolate.",
+      "description": "Bebida láctea sabor chocolate. Producto ficticio para la POC Yellow Cola.",
+      "primaryImageKey": "yc-p019-main",
+      "skus": [
+        {
+          "sku": "MM-CHOCO-250-TETRA-06",
+          "flavor": "CHOCO",
+          "volumeMl": 250,
+          "containerType": "TETRA",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 250 ml",
+          "priceMxn": 90
+        },
+        {
+          "sku": "MM-CHOCO-1000-TETRA-01",
+          "flavor": "CHOCO",
+          "volumeMl": 1000,
+          "containerType": "TETRA",
+          "unitsPerPack": 1,
+          "packLabel": "1000 ml",
+          "priceMxn": 43
+        }
+      ]
+    },
+    {
+      "productId": "YC-P020",
+      "brand": "Morning Moo",
+      "name": "Morning Moo Strawberry",
+      "slug": "morning-moo-strawberry",
+      "categoryLevel1": "lacteos",
+      "categoryLevel2": "bebidas-saborizadas",
+      "shortDescription": "Bebida láctea sabor fresa.",
+      "description": "Bebida láctea sabor fresa. Producto ficticio para la POC Yellow Cola.",
+      "primaryImageKey": "yc-p020-main",
+      "skus": [
+        {
+          "sku": "MM-STRAW-250-TETRA-06",
+          "flavor": "STRAW",
+          "volumeMl": 250,
+          "containerType": "TETRA",
+          "unitsPerPack": 6,
+          "packLabel": "6 x 250 ml",
+          "priceMxn": 94
+        },
+        {
+          "sku": "MM-STRAW-1000-TETRA-01",
+          "flavor": "STRAW",
+          "volumeMl": 1000,
+          "containerType": "TETRA",
+          "unitsPerPack": 1,
+          "packLabel": "1000 ml",
+          "priceMxn": 45
+        }
+      ]
+    }
+  ]
+}

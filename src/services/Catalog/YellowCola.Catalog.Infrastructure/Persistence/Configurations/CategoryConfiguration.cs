@@ -34,5 +34,13 @@ internal sealed class CategoryConfiguration
 
         builder.HasIndex(x => x.Slug)
             .IsUnique();
+
+        builder.Property(x => x.ParentId)
+            .HasColumnName("parent_id");
+
+        builder.HasOne<Category>()
+            .WithMany()
+            .HasForeignKey(x => x.ParentId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

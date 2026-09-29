@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using YellowCola.Catalog.Domain.Categories;
 using YellowCola.Catalog.Domain.Products;
 
 namespace YellowCola.Catalog.Infrastructure.Persistence.Configurations;
@@ -52,5 +53,28 @@ internal sealed class ProductConfiguration
             .WithOne()
             .HasForeignKey(x => x.ProductId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Property(x => x.Code)
+            .HasColumnName("code")
+            .HasMaxLength(20)
+            .IsRequired();
+
+        builder.Property(x => x.ShortDescription)
+            .HasColumnName("short_description")
+            .HasMaxLength(300)
+            .IsRequired();
+
+        builder.Property(x => x.PrimaryImageKey)
+            .HasColumnName("primary_image_key")
+            .HasMaxLength(100)
+            .IsRequired();
+        
+        builder.HasOne<Category>()
+            .WithMany()
+            .HasForeignKey(x => x.CategoryId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(x => x.Code)
+            .IsUnique();
     }
 }
