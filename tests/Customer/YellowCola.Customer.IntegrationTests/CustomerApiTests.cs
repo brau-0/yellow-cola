@@ -296,6 +296,36 @@ public sealed class CustomerApiTests
             response.StatusCode);
     }
 
+    [Fact]
+    public async Task InvalidPostalCodeShouldReturn400()
+    {
+        var customerId =
+            await CreateCustomerAsync(
+                "invalid-postal-code-subject");
+
+        var response =
+            await Client.PostAsJsonAsync(
+                $"/api/customers/{customerId}/addresses",
+                new
+                {
+                    label = "Home",
+                    recipientName = "John Doe",
+                    postalCode = "ABC12",
+                    state = "Ciudad de México",
+                    municipality = "Cuauhtémoc",
+                    neighborhood = "Juárez",
+                    street = "Paseo de la Reforma",
+                    exteriorNumber = "100",
+                    interiorNumber =
+                        (string?)null,
+                    reference =
+                        (string?)null
+                });
+
+        Assert.Equal(
+            HttpStatusCode.BadRequest,
+            response.StatusCode);
+    }
     private async Task<Guid> CreateCustomerAsync(
         string externalSubject)
     {

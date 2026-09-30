@@ -90,11 +90,11 @@ public static class CustomerEndpoints
     }
 
     private static async Task<IResult>
-        AddAddressAsync(
-            Guid customerId,
-            CreateAddressRequest request,
-            CustomerApplicationService service,
-            CancellationToken cancellationToken)
+    AddAddressAsync(
+        Guid customerId,
+        CreateAddressRequest request,
+        CustomerApplicationService service,
+        CancellationToken cancellationToken)
     {
         var command =
             new AddAddressCommand(
@@ -109,23 +109,34 @@ public static class CustomerEndpoints
                 request.InteriorNumber,
                 request.Reference);
 
-        var addressId =
-            await service.AddAddressAsync(
-                customerId,
-                command,
-                cancellationToken);
-
-        if (addressId is null)
+        try
         {
-            return Results.NotFound();
-        }
+            var addressId =
+                await service.AddAddressAsync(
+                    customerId,
+                    command,
+                    cancellationToken);
 
-        return Results.Created(
-            $"/api/customers/{customerId}",
-            new
+            if (addressId is null)
             {
-                addressId
-            });
+                return Results.NotFound();
+            }
+
+            return Results.Created(
+                $"/api/customers/{customerId}",
+                new
+                {
+                    addressId
+                });
+        }
+        catch (ArgumentException exception)
+        {
+            return Results.BadRequest(
+                new
+                {
+                    error = exception.Message
+                });
+        }
     }
 
     private static async Task<IResult>

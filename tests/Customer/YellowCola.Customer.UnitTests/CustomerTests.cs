@@ -117,6 +117,29 @@ public sealed class CustomerTests
         Assert.Throws<InvalidOperationException>(action);
     }
 
+    [Fact]
+    public void AddAddressWithInvalidPostalCodeShouldFail()
+    {
+        var customer =
+            CreateCustomer();
+
+        Action action = () =>
+            customer.AddAddress(
+                Guid.NewGuid(),
+                "Home",
+                "John Doe",
+                "ABC12",
+                "Ciudad de México",
+                "Cuauhtémoc",
+                "Juárez",
+                "Paseo de la Reforma",
+                "100",
+                null,
+                null);
+
+        Assert.Throws<ArgumentException>(
+            action);
+    }
     private static CustomerEntity CreateCustomer()
     {
         return new CustomerEntity(
