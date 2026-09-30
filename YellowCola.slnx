@@ -6,9 +6,19 @@
     <Project Path="src/services/Catalog/YellowCola.Catalog.Domain/YellowCola.Catalog.Domain.csproj" />
     <Project Path="src/services/Catalog/YellowCola.Catalog.Infrastructure/YellowCola.Catalog.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/Services/Customer/">
+    <Project Path="src/services/Customer/YellowCola.Customer.Api/YellowCola.Customer.Api.csproj" />
+    <Project Path="src/services/Customer/YellowCola.Customer.Application/YellowCola.Customer.Application.csproj" />
+    <Project Path="src/services/Customer/YellowCola.Customer.Domain/YellowCola.Customer.Domain.csproj" />
+    <Project Path="src/services/Customer/YellowCola.Customer.Infrastructure/YellowCola.Customer.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/Tests/" />
   <Folder Name="/Tests/Catalog/">
     <Project Path="tests/Catalog/YellowCola.Catalog.IntegrationTests/YellowCola.Catalog.IntegrationTests.csproj" />
     <Project Path="tests/Catalog/YellowCola.Catalog.UnitTests/YellowCola.Catalog.UnitTests.csproj" />
+  </Folder>
+  <Folder Name="/Tests/Customer/">
+    <Project Path="tests/Customer/YellowCola.Customer.IntegrationTests/YellowCola.Customer.IntegrationTests.csproj" />
+    <Project Path="tests/Customer/YellowCola.Customer.UnitTests/YellowCola.Customer.UnitTests.csproj" />
   </Folder>
 </Solution>

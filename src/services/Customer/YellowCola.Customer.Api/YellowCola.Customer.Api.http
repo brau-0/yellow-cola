@@ -1,0 +1,16 @@
+@host = http://localhost:5277
+
+### Health
+
+GET {{host}}/health
+Accept: application/json
+
+
+### Create customer
+
+POST {{host}}/api/customers
+Content-Type: application/json
+
+{
+  "externalSubject": "demo-subject-001"
+}

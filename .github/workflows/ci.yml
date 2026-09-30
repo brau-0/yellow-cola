@@ -49,15 +49,51 @@ jobs:
           --no-restore
 
       - name: Run unit tests
-        run: >
-          dotnet test
-          tests/Catalog/YellowCola.Catalog.UnitTests/YellowCola.Catalog.UnitTests.csproj
-          --configuration Release
-          --no-build
+        shell: bash
+        run: |
+          shopt -s globstar nullglob
+
+          projects=(tests/**/*UnitTests.csproj)
+
+          if [ ${#projects[@]} -eq 0 ]; then
+            echo "No unit test projects found."
+            exit 1
+          fi
+
+          echo "Discovered unit test projects:"
+
+          printf ' - %s\n' "${projects[@]}"
+
+          for project in "${projects[@]}"; do
+            echo "Running $project"
+
+            dotnet test "$project" \
+              --configuration Release \
+              --no-build \
+              --no-restore
+          done
 
       - name: Run integration tests
-        run: >
-          dotnet test
-          tests/Catalog/YellowCola.Catalog.IntegrationTests/YellowCola.Catalog.IntegrationTests.csproj
-          --configuration Release
-          --no-build
+        shell: bash
+        run: |
+          shopt -s globstar nullglob
+
+          projects=(tests/**/*IntegrationTests.csproj)
+
+          if [ ${#projects[@]} -eq 0 ]; then
+            echo "No integration test projects found."
+            exit 1
+          fi
+
+          echo "Discovered integration test projects:"
+
+          printf ' - %s\n' "${projects[@]}"
+
+          for project in "${projects[@]}"; do
+            echo "Running $project"
+
+            dotnet test "$project" \
+              --configuration Release \
+              --no-build \
+              --no-restore
+          done
