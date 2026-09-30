@@ -18,6 +18,7 @@
     <Project Path="tests/Catalog/YellowCola.Catalog.UnitTests/YellowCola.Catalog.UnitTests.csproj" />
   </Folder>
   <Folder Name="/Tests/Customer/">
+    <Project Path="tests/Customer/YellowCola.Customer.IntegrationTests/YellowCola.Customer.IntegrationTests.csproj" />
     <Project Path="tests/Customer/YellowCola.Customer.UnitTests/YellowCola.Customer.UnitTests.csproj" />
   </Folder>
 </Solution>

@@ -41,8 +41,7 @@ public sealed class Address
         RecipientName =
             Required(recipientName, nameof(recipientName));
 
-        PostalCode =
-            Required(postalCode, nameof(postalCode));
+        PostalCode = ValidatePostalCode(postalCode);
 
         State =
             Required(state, nameof(state));
@@ -65,7 +64,24 @@ public sealed class Address
         Reference =
             NormalizeOptional(reference);
     }
+    private static string ValidatePostalCode(
+    string postalCode)
+    {
+        var value =
+            Required(
+                postalCode,
+                nameof(postalCode));
 
+        if (value.Length != 5 ||
+            !value.All(char.IsDigit))
+        {
+            throw new ArgumentException(
+                "Postal code must contain exactly 5 digits.",
+                nameof(postalCode));
+        }
+
+        return value;
+    }
     public Guid Id { get; private set; }
 
     public Guid CustomerId { get; private set; }
