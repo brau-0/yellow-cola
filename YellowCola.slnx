@@ -28,6 +28,7 @@
     <Project Path="tests/Customer/YellowCola.Customer.UnitTests/YellowCola.Customer.UnitTests.csproj" />
   </Folder>
   <Folder Name="/Tests/Inventory/">
+    <Project Path="tests/Inventory/YellowCola.Inventory.IntegrationTests/YellowCola.Inventory.IntegrationTests.csproj" />
     <Project Path="tests/Inventory/YellowCola.Inventory.UnitTests/YellowCola.Inventory.UnitTests.csproj" />
   </Folder>
 </Solution>

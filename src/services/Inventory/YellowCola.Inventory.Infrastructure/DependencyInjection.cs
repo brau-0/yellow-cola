@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using YellowCola.Inventory.Application.Inventory;
+using YellowCola.Inventory.Application.Persistence;
+using YellowCola.Inventory.Infrastructure.Repositories;
 
 using YellowCola.Inventory.Infrastructure.Persistence;
 
@@ -27,6 +30,10 @@ public static class DependencyInjection
                 options.UseNpgsql(
                     connectionString);
             });
+        
+        services.AddScoped< IInventoryRepository, InventoryRepository>();
+
+        services.AddScoped< IInventoryUnitOfWork,InventoryUnitOfWork>();
 
         return services;
     }

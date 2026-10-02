@@ -1,7 +1,14 @@
 using YellowCola.Inventory.Infrastructure;
+using YellowCola.Inventory.Application.Inventory;
+
+
 
 var builder =
     WebApplication.CreateBuilder(args);
+
+
+builder.Services.AddScoped<
+    InventoryApplicationService>();
 
 builder.Services.AddInfrastructure();
 
