@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\services\Inventory\YellowCola.Inventory.Application\YellowCola.Inventory.Application.csproj" />
     <ProjectReference Include="..\..\..\src\services\Inventory\YellowCola.Inventory.Domain\YellowCola.Inventory.Domain.csproj" />
   </ItemGroup>
 

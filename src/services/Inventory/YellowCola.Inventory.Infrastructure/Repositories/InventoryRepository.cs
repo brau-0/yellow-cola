@@ -6,8 +6,7 @@ using YellowCola.Inventory.Infrastructure.Persistence;
 
 namespace YellowCola.Inventory.Infrastructure.Repositories;
 
-internal sealed class InventoryRepository(
-    InventoryDbContext dbContext)
+internal sealed class InventoryRepository(InventoryDbContext dbContext)
     : IInventoryRepository
 {
     public Task<InventoryItem?>
@@ -16,8 +15,7 @@ internal sealed class InventoryRepository(
             string warehouseCode,
             CancellationToken cancellationToken = default)
     {
-        return dbContext.InventoryItems
-            .FromSqlInterpolated(
+        return dbContext.InventoryItems.FromSqlInterpolated(
                 $"""
                 SELECT
                     id,
@@ -30,6 +28,25 @@ internal sealed class InventoryRepository(
                   AND warehouse_code = {warehouseCode}
                 FOR UPDATE
                 """)
+            .SingleOrDefaultAsync(
+                cancellationToken);
+    }
+
+    public Task<InventoryItem?>    GetByIdForUpdateAsync(Guid inventoryItemId, CancellationToken cancellationToken = default)
+    {
+        return dbContext.InventoryItems
+            .FromSqlInterpolated(
+                $"""
+            SELECT
+                id,
+                sku_id,
+                warehouse_code,
+                on_hand,
+                reserved
+            FROM inventory_items
+            WHERE id = {inventoryItemId}
+            FOR UPDATE
+            """)
             .SingleOrDefaultAsync(
                 cancellationToken);
     }

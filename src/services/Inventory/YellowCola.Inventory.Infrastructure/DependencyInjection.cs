@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using YellowCola.Inventory.Application.Inventory;
 using YellowCola.Inventory.Application.Persistence;
 using YellowCola.Inventory.Infrastructure.Repositories;
-
+using YellowCola.Inventory.Application.Reservations;
 using YellowCola.Inventory.Infrastructure.Persistence;
 
 namespace YellowCola.Inventory.Infrastructure;
@@ -34,6 +34,7 @@ public static class DependencyInjection
         services.AddScoped< IInventoryRepository, InventoryRepository>();
 
         services.AddScoped< IInventoryUnitOfWork,InventoryUnitOfWork>();
+        services.AddScoped< IInventoryReservationRepository, InventoryReservationRepository>();
 
         return services;
     }

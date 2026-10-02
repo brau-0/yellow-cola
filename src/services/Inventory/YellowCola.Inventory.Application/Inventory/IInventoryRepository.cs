@@ -8,4 +8,7 @@ public interface IInventoryRepository
         Guid skuId,
         string warehouseCode,
         CancellationToken cancellationToken = default);
+    Task<InventoryItem?> GetByIdForUpdateAsync(
+        Guid inventoryItemId,
+        CancellationToken cancellationToken = default);
 }

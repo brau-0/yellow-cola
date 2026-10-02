@@ -6,6 +6,8 @@ using YellowCola.Inventory.Application.Inventory;
 var builder =
     WebApplication.CreateBuilder(args);
 
+builder.Services.AddSingleton(
+    TimeProvider.System);
 
 builder.Services.AddScoped<
     InventoryApplicationService>();

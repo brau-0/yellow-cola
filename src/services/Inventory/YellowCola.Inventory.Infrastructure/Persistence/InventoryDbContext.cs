@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
 using YellowCola.Inventory.Domain.InventoryItems;
+using YellowCola.Inventory.Domain.Reservations;
 
 namespace YellowCola.Inventory.Infrastructure.Persistence;
 
@@ -10,6 +11,10 @@ public sealed class InventoryDbContext(
 {
     public DbSet<InventoryItem> InventoryItems =>
         Set<InventoryItem>();
+
+    public DbSet<InventoryReservation>
+        InventoryReservations =>
+            Set<InventoryReservation>();
 
     protected override void OnModelCreating(
         ModelBuilder modelBuilder)

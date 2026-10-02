@@ -1,16 +1,13 @@
 ﻿using YellowCola.Inventory.Domain.Reservations;
 
-namespace YellowCola.Inventory.Application.Inventory;
+namespace YellowCola.Inventory.Application.Reservations;
 
-public sealed record ReserveInventoryResult(
+public sealed record ReservationTransitionResult(
     Guid ReservationId,
     Guid OrderId,
     Guid InventoryItemId,
-    Guid SkuId,
-    string WarehouseCode,
     int Quantity,
     InventoryReservationStatus Status,
-    DateTimeOffset ExpiresAtUtc,
     int OnHand,
     int Reserved,
     int Available);

@@ -105,17 +105,33 @@ public sealed class InventoryItemTests
             105,
             item.Available);
     }
+    [Fact]
+    public void ConsumeReservedShouldReduceOnHandAndReserved()
+    {
+        var item = CreateInventoryItem( onHand: 10,
+            reserved: 3);
+
+        item.ConsumeReserved(3);
+
+        Assert.Equal(7, item.OnHand);
+
+        Assert.Equal(0, item.Reserved);
+
+        Assert.Equal(7, item.Available);
+    }
+    [Fact]
+    public void ConsumeMoreThanReservedShouldFail()
+    {
+        var item = CreateInventoryItem(onHand: 10, reserved: 3);
+
+        Action action = () => item.ConsumeReserved(4);
+
+        Assert.Throws<InvalidOperationException>(action);
+    }
 
     private static InventoryItem
-        CreateInventoryItem(
-            int onHand,
-            int reserved)
+        CreateInventoryItem(int onHand, int reserved)
     {
-        return new InventoryItem(
-            Guid.NewGuid(),
-            Guid.NewGuid(),
-            "WH-MX-01",
-            onHand,
-            reserved);
+        return new InventoryItem(Guid.NewGuid(), Guid.NewGuid(), "WH-MX-01", onHand, reserved);
     }
 }

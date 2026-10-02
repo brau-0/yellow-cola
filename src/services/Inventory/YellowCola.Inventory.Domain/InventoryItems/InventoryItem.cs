@@ -118,4 +118,19 @@ public sealed class InventoryItem
                 "Quantity must be greater than zero.");
         }
     }
+    public void ConsumeReserved(
+    int quantity)
+    {
+        EnsurePositiveQuantity(
+            quantity);
+
+        if (quantity > Reserved)
+        {
+            throw new InvalidOperationException(
+                "Cannot consume more inventory than is reserved.");
+        }
+
+        Reserved -= quantity;
+        OnHand -= quantity;
+    }
 }
