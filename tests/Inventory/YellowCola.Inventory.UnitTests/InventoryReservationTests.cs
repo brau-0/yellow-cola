@@ -1,5 +1,4 @@
-﻿using YellowCola.Inventory.Application.Reservations;
-using YellowCola.Inventory.Domain.Reservations;
+﻿using YellowCola.Inventory.Domain.Reservations;
 
 namespace YellowCola.Inventory.UnitTests;
 
