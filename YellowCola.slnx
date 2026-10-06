@@ -1,5 +1,11 @@
 <Solution>
   <Folder Name="/Services/" />
+  <Folder Name="/Services/Cart/">
+    <Project Path="src/services/Cart/YellowCola.Cart.Api/YellowCola.Cart.Api.csproj" />
+    <Project Path="src/services/Cart/YellowCola.Cart.Application/YellowCola.Cart.Application.csproj" />
+    <Project Path="src/services/Cart/YellowCola.Cart.Domain/YellowCola.Cart.Domain.csproj" />
+    <Project Path="src/services/Cart/YellowCola.Cart.Infrastructure/YellowCola.Cart.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/Services/Catalog/">
     <Project Path="src/services/Catalog/YellowCola.Catalog.Api/YellowCola.Catalog.Api.csproj" />
     <Project Path="src/services/Catalog/YellowCola.Catalog.Application/YellowCola.Catalog.Application.csproj" />
@@ -19,6 +25,10 @@
     <Project Path="src/services/Inventory/YellowCola.Inventory.Infrastructure/YellowCola.Inventory.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Tests/" />
+  <Folder Name="/Tests/Cart/">
+    <Project Path="tests/Cart/YellowCola.Cart.IntegrationTests/YellowCola.Cart.IntegrationTests.csproj" />
+    <Project Path="tests/Cart/YellowCola.Cart.UnitTests/YellowCola.Cart.UnitTests.csproj" />
+  </Folder>
   <Folder Name="/Tests/Catalog/">
     <Project Path="tests/Catalog/YellowCola.Catalog.IntegrationTests/YellowCola.Catalog.IntegrationTests.csproj" />
     <Project Path="tests/Catalog/YellowCola.Catalog.UnitTests/YellowCola.Catalog.UnitTests.csproj" />
