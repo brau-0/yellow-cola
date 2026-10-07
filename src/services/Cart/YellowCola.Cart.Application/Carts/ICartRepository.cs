@@ -9,4 +9,9 @@ public interface ICartRepository
     Task<bool> CreateAsync(ShoppingCart cart, CancellationToken cancellationToken = default);
     Task<bool> TrySaveAsync(ShoppingCart cart, long expectedVersion, CancellationToken cancellationToken = default);
     Task<bool> DeleteAsync(Guid cartId, CancellationToken cancellationToken = default);
+    Task<bool> TryMergeAsync(ShoppingCart targetCart, long expectedTargetVersion, Guid sourceCartId,
+        long expectedSourceVersion, CancellationToken cancellationToken = default);
+    Task<Guid?> GetCustomerCartIdAsync(Guid customerId, CancellationToken cancellationToken = default);
+    Task<bool> TryCreateCustomerCartAsync(ShoppingCart cart, CancellationToken cancellationToken = default);
+    Task<bool> TryAssignCustomerAsync(ShoppingCart cart, long expectedVersion, CancellationToken cancellationToken = default);
 }

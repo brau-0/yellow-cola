@@ -63,6 +63,16 @@ public sealed class ShoppingCart
         _items.Remove(item);
         return true;
     }
+    public void MergeAnonymousCart(ShoppingCart source)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+
+        if (source.Id == Id) throw new InvalidOperationException("A cart cannot be merged with itself.");
+        if (!CustomerId.HasValue) throw new InvalidOperationException("Target cart must belong to a customer.");
+        if (source.CustomerId.HasValue) throw new InvalidOperationException("Source cart must be anonymous.");
+
+        foreach (var item in source.Items) AddItem(item.SkuId, item.Quantity);
+    }
 
     private static void ValidateSkuAndQuantity(Guid skuId, int quantity)
     {

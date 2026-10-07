@@ -131,6 +131,50 @@ public sealed class ShoppingCartTests
 
         Assert.Throws<ArgumentOutOfRangeException>(action);
     }
+    [Fact]
+    public void MergeAnonymousCartShouldCombineItems()
+    {
+        var skuA = Guid.NewGuid();
+        var skuB = Guid.NewGuid();
+        var skuC = Guid.NewGuid();
+
+        var target = new ShoppingCart(Guid.NewGuid(), Guid.NewGuid());
+        target.AddItem(skuA, 3);
+        target.AddItem(skuC, 2);
+
+        var source = new ShoppingCart(Guid.NewGuid());
+        source.AddItem(skuA, 2);
+        source.AddItem(skuB, 1);
+
+        target.MergeAnonymousCart(source);
+
+        Assert.Equal(3, target.Items.Count);
+        Assert.Equal(5, target.Items.Single(item => item.SkuId == skuA).Quantity);
+        Assert.Equal(1, target.Items.Single(item => item.SkuId == skuB).Quantity);
+        Assert.Equal(2, target.Items.Single(item => item.SkuId == skuC).Quantity);
+        Assert.Equal(8, target.TotalQuantity);
+    }
+
+    [Fact]
+    public void MergeCustomerCartIntoAnotherCustomerCartShouldFail()
+    {
+        var target = new ShoppingCart(Guid.NewGuid(), Guid.NewGuid());
+        var source = new ShoppingCart(Guid.NewGuid(), Guid.NewGuid());
+
+        Action action = () => target.MergeAnonymousCart(source);
+
+        Assert.Throws<InvalidOperationException>(action);
+    }
+
+    [Fact]
+    public void MergeCartWithItselfShouldFail()
+    {
+        var cart = new ShoppingCart(Guid.NewGuid(), Guid.NewGuid());
+
+        Action action = () => cart.MergeAnonymousCart(cart);
+
+        Assert.Throws<InvalidOperationException>(action);
+    }
 
     private static ShoppingCart CreateCart() => new(Guid.NewGuid());
 }
