@@ -50,7 +50,7 @@ public sealed class RedisCartRepositoryTests : IAsyncLifetime
         using var scope = _factory.Services.CreateScope();
         var repository = scope.ServiceProvider.GetRequiredService<ICartRepository>();
 
-        var created = await repository.CreateAsync(cart);
+        var created = await repository.TryCreateCustomerCartAsync(cart);
         Assert.True(created);
         var restored = await repository.GetAsync(cartId);
 
@@ -87,10 +87,10 @@ public sealed class RedisCartRepositoryTests : IAsyncLifetime
         using var scope = _factory.Services.CreateScope();
         var repository = scope.ServiceProvider.GetRequiredService<ICartRepository>();
 
-        var created = await repository.CreateAsync(cart);
+        var created = await repository.CreateAnonymousAsync(cart);
         Assert.True(created);
 
-        var deleted = await repository.DeleteAsync(cart.Id);
+        var deleted = await repository.DeleteAnonymousAsync(cart.Id);
         var restored = await repository.GetAsync(cart.Id);
 
         Assert.True(deleted);
@@ -101,7 +101,7 @@ public sealed class RedisCartRepositoryTests : IAsyncLifetime
     {
         ArgumentNullException.ThrowIfNull(_factory);
 
-        var cart = new ShoppingCart(Guid.NewGuid());
+        var cart = new ShoppingCart(Guid.NewGuid(), Guid.NewGuid());
         cart.AddItem(Guid.NewGuid(), 1);
 
         using var scope = _factory.Services.CreateScope();
@@ -109,7 +109,7 @@ public sealed class RedisCartRepositoryTests : IAsyncLifetime
         var repository = scope.ServiceProvider.GetRequiredService<ICartRepository>();
         var connection = scope.ServiceProvider.GetRequiredService<IConnectionMultiplexer>();
 
-        var created = await repository.CreateAsync(cart);
+        var created = await repository.TryCreateCustomerCartAsync(cart);
         Assert.True(created);
 
         var database = connection.GetDatabase();
@@ -160,13 +160,13 @@ public sealed class RedisCartRepositoryTests : IAsyncLifetime
     {
         ArgumentNullException.ThrowIfNull(_factory);
 
-        var cart = new ShoppingCart(Guid.NewGuid());
+        var cart = new ShoppingCart(Guid.NewGuid(), Guid.NewGuid());
         cart.AddItem(Guid.NewGuid(), 1);
 
         using var scope = _factory.Services.CreateScope();
         var repository = scope.ServiceProvider.GetRequiredService<ICartRepository>();
 
-        Assert.True(await repository.CreateAsync(cart));
+        Assert.True(await repository.TryCreateCustomerCartAsync(cart));
 
         var before = await repository.GetVersionedAsync(cart.Id);
 
@@ -181,6 +181,116 @@ public sealed class RedisCartRepositoryTests : IAsyncLifetime
 
         Assert.NotNull(after);
         Assert.Equal(2, after.Version);
+    }
+    [Fact]
+    public async Task CustomerIndexTtlShouldRefreshWhenCustomerCartIsUpdated()
+    {
+        ArgumentNullException.ThrowIfNull(_factory);
+
+        var customerId = Guid.NewGuid();
+        var skuId = Guid.NewGuid();
+
+        using var scope = _factory.Services.CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<CartApplicationService>();
+        var repository = scope.ServiceProvider.GetRequiredService<ICartRepository>();
+        var connection = scope.ServiceProvider.GetRequiredService<IConnectionMultiplexer>();
+
+        var cart = await service.CreateAsync(customerId);
+
+        var database = connection.GetDatabase();
+        var customerKey = $"yc:customer-cart:{customerId:N}";
+
+        Assert.True(await database.KeyExpireAsync(customerKey, TimeSpan.FromMinutes(1)));
+
+        await service.AddItemAsync(cart.Id, skuId, 1);
+
+        var ttl = await database.KeyTimeToLiveAsync(customerKey);
+
+        Assert.NotNull(ttl);
+        Assert.True(ttl > TimeSpan.FromDays(29));
+        Assert.True(ttl <= TimeSpan.FromDays(30));
+
+        Assert.Equal(cart.Id, await repository.GetCustomerCartIdAsync(customerId));
+    }
+    [Fact]
+    public async Task StaleCustomerIndexShouldBeRepairedWhenCreatingCart()
+    {
+        ArgumentNullException.ThrowIfNull(_factory);
+
+        var customerId = Guid.NewGuid();
+        var staleCartId = Guid.NewGuid();
+
+        using var scope = _factory.Services.CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<CartApplicationService>();
+        var repository = scope.ServiceProvider.GetRequiredService<ICartRepository>();
+        var connection = scope.ServiceProvider.GetRequiredService<IConnectionMultiplexer>();
+
+        var database = connection.GetDatabase();
+        var customerKey = $"yc:customer-cart:{customerId:N}";
+
+        await database.StringSetAsync(customerKey, staleCartId.ToString("D"), TimeSpan.FromDays(30));
+
+        var cart = await service.CreateAsync(customerId);
+        var activeCartId = await repository.GetCustomerCartIdAsync(customerId);
+
+        Assert.NotEqual(staleCartId, cart.Id);
+        Assert.Equal(cart.Id, activeCartId);
+        Assert.Equal(customerId, cart.CustomerId);
+    }
+    [Fact]
+    public async Task MergeShouldRefreshCustomerIndexExpiration()
+    {
+        ArgumentNullException.ThrowIfNull(_factory);
+
+        var customerId = Guid.NewGuid();
+
+        using var scope = _factory.Services.CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<CartApplicationService>();
+        var connection = scope.ServiceProvider.GetRequiredService<IConnectionMultiplexer>();
+
+        var target = await service.CreateAsync(customerId);
+        var source = await service.CreateAsync();
+
+        await service.AddItemAsync(source.Id, Guid.NewGuid(), 2);
+
+        var database = connection.GetDatabase();
+        var customerKey = $"yc:customer-cart:{customerId:N}";
+
+        Assert.True(await database.KeyExpireAsync(customerKey, TimeSpan.FromMinutes(1)));
+
+        var merged = await service.MergeAnonymousCartAsync(target.Id, source.Id);
+
+        Assert.NotNull(merged);
+
+        var ttl = await database.KeyTimeToLiveAsync(customerKey);
+
+        Assert.NotNull(ttl);
+        Assert.True(ttl > TimeSpan.FromDays(29));
+        Assert.True(ttl <= TimeSpan.FromDays(30));
+    }
+    [Fact]
+    public async Task CreateAnonymousShouldRejectCustomerCart()
+    {
+        ArgumentNullException.ThrowIfNull(_factory);
+
+        var cart = new ShoppingCart(Guid.NewGuid(), Guid.NewGuid());
+
+        using var scope = _factory.Services.CreateScope();
+        var repository = scope.ServiceProvider.GetRequiredService<ICartRepository>();
+
+        await Assert.ThrowsAsync<ArgumentException>(() => repository.CreateAnonymousAsync(cart));
+    }
+    [Fact]
+    public async Task CreateCustomerCartShouldRejectAnonymousCart()
+    {
+        ArgumentNullException.ThrowIfNull(_factory);
+
+        var cart = new ShoppingCart(Guid.NewGuid());
+
+        using var scope = _factory.Services.CreateScope();
+        var repository = scope.ServiceProvider.GetRequiredService<ICartRepository>();
+
+        await Assert.ThrowsAsync<ArgumentException>(() => repository.TryCreateCustomerCartAsync(cart));
     }
     private async Task<ShoppingCart?> AddAfterSignalAsync(Guid cartId, Guid skuId, int quantity, Task startSignal)
     {

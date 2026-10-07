@@ -5,7 +5,7 @@ namespace YellowCola.Cart.Api.Endpoints;
 
 internal static class CartEndpoints
 {
-    public sealed record MergeCartRequest(Guid SourceCartId);
+
     public static IEndpointRouteBuilder MapCartEndpoints(this IEndpointRouteBuilder endpoints)
     {
         var group = endpoints.MapGroup("/api/carts").WithTags("Cart");

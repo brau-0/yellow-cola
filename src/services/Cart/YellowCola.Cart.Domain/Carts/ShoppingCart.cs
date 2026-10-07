@@ -31,6 +31,7 @@ public sealed class ShoppingCart
     public void AddItem(Guid skuId, int quantity)
     {
         ValidateSkuAndQuantity(skuId, quantity);
+        EnsureTotalQuantityDoesNotOverflow(quantity);
 
         var existingItem = _items.SingleOrDefault(item => item.SkuId == skuId);
 
@@ -42,13 +43,16 @@ public sealed class ShoppingCart
 
         existingItem.Increase(quantity);
     }
-
     public void SetQuantity(Guid skuId, int quantity)
     {
         ValidateSkuAndQuantity(skuId, quantity);
 
         var item = _items.SingleOrDefault(item => item.SkuId == skuId)
             ?? throw new InvalidOperationException("Cart item was not found.");
+
+        var newTotal = _items.Sum(current => (long)current.Quantity) - item.Quantity + quantity;
+
+        if (newTotal > int.MaxValue) throw new InvalidOperationException("Cart total quantity exceeds the supported limit.");
 
         item.SetQuantity(quantity);
     }
@@ -78,5 +82,11 @@ public sealed class ShoppingCart
     {
         if (skuId == Guid.Empty) throw new ArgumentException("SKU id cannot be empty.", nameof(skuId));
         if (quantity <= 0) throw new ArgumentOutOfRangeException(nameof(quantity), "Quantity must be greater than zero.");
+    }
+    private void EnsureTotalQuantityDoesNotOverflow(int quantity)
+    {
+        var newTotal = _items.Sum(item => (long)item.Quantity) + quantity;
+
+        if (newTotal > int.MaxValue) throw new InvalidOperationException("Cart total quantity exceeds the supported limit.");
     }
 }

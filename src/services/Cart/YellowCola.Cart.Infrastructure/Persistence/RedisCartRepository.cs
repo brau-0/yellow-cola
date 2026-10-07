@@ -46,9 +46,12 @@ internal sealed class RedisCartRepository(IConnectionMultiplexer connectionMulti
         return new VersionedCart(ToDomain(document), version);
     }
 
-    public async Task<bool> CreateAsync(ShoppingCart cart, CancellationToken cancellationToken = default)
+    public async Task<bool> CreateAnonymousAsync(ShoppingCart cart, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(cart);
+
+        if (cart.CustomerId.HasValue) throw new ArgumentException("Anonymous cart cannot have a customer id.", nameof(cart));
+
         cancellationToken.ThrowIfCancellationRequested();
 
         var database = connectionMultiplexer.GetDatabase();
@@ -77,8 +80,34 @@ internal sealed class RedisCartRepository(IConnectionMultiplexer connectionMulti
         var json = JsonSerializer.Serialize(ToDocument(cart));
         var nextVersion = checked(expectedVersion + 1);
 
+        RedisKey? customerKey = null;
+        RedisValue currentCustomerCartId = RedisValue.Null;
+        var cartIdValue = cart.Id.ToString("D");
+
+        if (cart.CustomerId.HasValue)
+        {
+            customerKey = GetCustomerCartKey(cart.CustomerId.Value);
+            currentCustomerCartId = await database.StringGetAsync(customerKey.Value);
+
+            if (!currentCustomerCartId.IsNullOrEmpty && currentCustomerCartId != cartIdValue) return false;
+        }
+
         var transaction = database.CreateTransaction();
         transaction.AddCondition(Condition.HashEqual(key, VersionField, expectedVersion));
+
+        if (customerKey.HasValue)
+        {
+            if (currentCustomerCartId.IsNullOrEmpty)
+            {
+                transaction.AddCondition(Condition.KeyNotExists(customerKey.Value));
+                _ = transaction.StringSetAsync(customerKey.Value, cartIdValue, CartLifetime);
+            }
+            else
+            {
+                transaction.AddCondition(Condition.StringEqual(customerKey.Value, cartIdValue));
+                _ = transaction.KeyExpireAsync(customerKey.Value, CartLifetime);
+            }
+        }
 
         _ = transaction.HashSetAsync(key, DataField, json);
         _ = transaction.HashSetAsync(key, VersionField, nextVersion);
@@ -86,17 +115,14 @@ internal sealed class RedisCartRepository(IConnectionMultiplexer connectionMulti
 
         return await transaction.ExecuteAsync();
     }
-    public async Task<bool> TryMergeAsync(
-    ShoppingCart targetCart,
-    long expectedTargetVersion,
-    Guid sourceCartId,
-    long expectedSourceVersion,
-    CancellationToken cancellationToken = default)
+    public async Task<bool> TryMergeAsync(ShoppingCart targetCart, long expectedTargetVersion, Guid sourceCartId, long expectedSourceVersion, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(targetCart);
 
+        if (!targetCart.CustomerId.HasValue) throw new ArgumentException("Target cart must have a customer id.", nameof(targetCart));
         if (sourceCartId == Guid.Empty) throw new ArgumentException("Source cart id cannot be empty.", nameof(sourceCartId));
         if (targetCart.Id == sourceCartId) throw new ArgumentException("Target and source cart must be different.");
+
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(expectedTargetVersion);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(expectedSourceVersion);
 
@@ -105,6 +131,12 @@ internal sealed class RedisCartRepository(IConnectionMultiplexer connectionMulti
         var database = connectionMultiplexer.GetDatabase();
         var targetKey = GetKey(targetCart.Id);
         var sourceKey = GetKey(sourceCartId);
+        var customerKey = GetCustomerCartKey(targetCart.CustomerId.Value);
+        var targetCartIdValue = targetCart.Id.ToString("D");
+        var existingCustomerCartId = await database.StringGetAsync(customerKey);
+
+        if (!existingCustomerCartId.IsNullOrEmpty && existingCustomerCartId != targetCartIdValue) return false;
+
         var json = JsonSerializer.Serialize(ToDocument(targetCart));
         var nextVersion = checked(expectedTargetVersion + 1);
 
@@ -113,6 +145,17 @@ internal sealed class RedisCartRepository(IConnectionMultiplexer connectionMulti
         transaction.AddCondition(Condition.HashEqual(targetKey, VersionField, expectedTargetVersion));
         transaction.AddCondition(Condition.HashEqual(sourceKey, VersionField, expectedSourceVersion));
 
+        if (existingCustomerCartId.IsNullOrEmpty)
+        {
+            transaction.AddCondition(Condition.KeyNotExists(customerKey));
+            _ = transaction.StringSetAsync(customerKey, targetCartIdValue, CartLifetime);
+        }
+        else
+        {
+            transaction.AddCondition(Condition.StringEqual(customerKey, targetCartIdValue));
+            _ = transaction.KeyExpireAsync(customerKey, CartLifetime);
+        }
+
         _ = transaction.HashSetAsync(targetKey, DataField, json);
         _ = transaction.HashSetAsync(targetKey, VersionField, nextVersion);
         _ = transaction.KeyExpireAsync(targetKey, CartLifetime);
@@ -120,12 +163,24 @@ internal sealed class RedisCartRepository(IConnectionMultiplexer connectionMulti
 
         return await transaction.ExecuteAsync();
     }
-    public async Task<bool> DeleteAsync(Guid cartId, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteAnonymousAsync(Guid cartId, CancellationToken cancellationToken = default)
     {
         ValidateCartId(cartId);
         cancellationToken.ThrowIfCancellationRequested();
 
-        return await connectionMultiplexer.GetDatabase().KeyDeleteAsync(GetKey(cartId));
+        var current = await GetVersionedAsync(cartId, cancellationToken);
+
+        if (current is null) return false;
+        if (current.Cart.CustomerId.HasValue) throw new InvalidOperationException("Customer cart cannot be deleted as an anonymous cart.");
+
+        var database = connectionMultiplexer.GetDatabase();
+        var key = GetKey(cartId);
+
+        var transaction = database.CreateTransaction();
+        transaction.AddCondition(Condition.HashEqual(key, VersionField, current.Version));
+        _ = transaction.KeyDeleteAsync(key);
+
+        return await transaction.ExecuteAsync();
     }
     public async Task<Guid?> GetCustomerCartIdAsync(Guid customerId, CancellationToken cancellationToken = default)
     {
@@ -168,31 +223,60 @@ internal sealed class RedisCartRepository(IConnectionMultiplexer connectionMulti
 
         return await transaction.ExecuteAsync();
     }
-
     public async Task<bool> TryAssignCustomerAsync(ShoppingCart cart, long expectedVersion, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(cart);
 
         if (!cart.CustomerId.HasValue) throw new ArgumentException("Cart must have a customer id.", nameof(cart));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(expectedVersion);
 
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(expectedVersion);
         cancellationToken.ThrowIfCancellationRequested();
 
         var database = connectionMultiplexer.GetDatabase();
         var cartKey = GetKey(cart.Id);
         var customerKey = GetCustomerCartKey(cart.CustomerId.Value);
+        var cartIdValue = cart.Id.ToString("D");
+        var existingCustomerCartId = await database.StringGetAsync(customerKey);
+
+        if (!existingCustomerCartId.IsNullOrEmpty && existingCustomerCartId != cartIdValue) return false;
+
         var json = JsonSerializer.Serialize(ToDocument(cart));
         var nextVersion = checked(expectedVersion + 1);
 
         var transaction = database.CreateTransaction();
-
         transaction.AddCondition(Condition.HashEqual(cartKey, VersionField, expectedVersion));
-        transaction.AddCondition(Condition.KeyNotExists(customerKey));
+
+        if (existingCustomerCartId.IsNullOrEmpty)
+        {
+            transaction.AddCondition(Condition.KeyNotExists(customerKey));
+            _ = transaction.StringSetAsync(customerKey, cartIdValue, CartLifetime);
+        }
+        else
+        {
+            transaction.AddCondition(Condition.StringEqual(customerKey, cartIdValue));
+            _ = transaction.KeyExpireAsync(customerKey, CartLifetime);
+        }
 
         _ = transaction.HashSetAsync(cartKey, DataField, json);
         _ = transaction.HashSetAsync(cartKey, VersionField, nextVersion);
         _ = transaction.KeyExpireAsync(cartKey, CartLifetime);
-        _ = transaction.StringSetAsync(customerKey, cart.Id.ToString("D"), CartLifetime);
+
+        return await transaction.ExecuteAsync();
+    }
+#pragma warning disable SER301 // Keep transaction-based compare-and-delete for compatibility with Redis versions before 8.4.
+    public async Task<bool> TryRemoveCustomerCartIndexAsync(Guid customerId, Guid expectedCartId, CancellationToken cancellationToken = default)
+    {
+        if (customerId == Guid.Empty) throw new ArgumentException("Customer id cannot be empty.", nameof(customerId));
+        if (expectedCartId == Guid.Empty) throw new ArgumentException("Expected cart id cannot be empty.", nameof(expectedCartId));
+
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var database = connectionMultiplexer.GetDatabase();
+        var customerKey = GetCustomerCartKey(customerId);
+
+        var transaction = database.CreateTransaction();
+        transaction.AddCondition(Condition.StringEqual(customerKey, expectedCartId.ToString("D")));
+        _ = transaction.KeyDeleteAsync(customerKey);
 
         return await transaction.ExecuteAsync();
     }

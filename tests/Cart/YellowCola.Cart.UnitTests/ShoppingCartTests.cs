@@ -175,6 +175,50 @@ public sealed class ShoppingCartTests
 
         Assert.Throws<InvalidOperationException>(action);
     }
+    [Fact]
+    public void AddingItemShouldFailWhenTotalQuantityWouldOverflow()
+    {
+        var cart = CreateCart();
 
+        cart.AddItem(Guid.NewGuid(), int.MaxValue);
+
+        Action action = () => cart.AddItem(Guid.NewGuid(), 1);
+
+        Assert.Throws<InvalidOperationException>(action);
+        Assert.Single(cart.Items);
+        Assert.Equal(int.MaxValue, cart.TotalQuantity);
+    }
+    [Fact]
+    public void IncreasingExistingItemShouldFailWhenTotalQuantityWouldOverflow()
+    {
+        var cart = CreateCart();
+        var skuA = Guid.NewGuid();
+        var skuB = Guid.NewGuid();
+
+        cart.AddItem(skuA, int.MaxValue - 1);
+        cart.AddItem(skuB, 1);
+
+        Action action = () => cart.AddItem(skuB, 1);
+
+        Assert.Throws<InvalidOperationException>(action);
+        Assert.Equal(1, cart.Items.Single(item => item.SkuId == skuB).Quantity);
+        Assert.Equal(int.MaxValue, cart.TotalQuantity);
+    }
+    [Fact]
+    public void SetQuantityShouldFailWhenTotalQuantityWouldOverflow()
+    {
+        var cart = CreateCart();
+        var skuA = Guid.NewGuid();
+        var skuB = Guid.NewGuid();
+
+        cart.AddItem(skuA, int.MaxValue - 1);
+        cart.AddItem(skuB, 1);
+
+        Action action = () => cart.SetQuantity(skuB, 2);
+
+        Assert.Throws<InvalidOperationException>(action);
+        Assert.Equal(1, cart.Items.Single(item => item.SkuId == skuB).Quantity);
+        Assert.Equal(int.MaxValue, cart.TotalQuantity);
+    }
     private static ShoppingCart CreateCart() => new(Guid.NewGuid());
 }

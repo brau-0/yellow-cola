@@ -15,35 +15,29 @@ public sealed class CartApplicationService(ICartRepository cartRepository)
         {
             var anonymousCart = new ShoppingCart(Guid.NewGuid());
 
-            if (!await cartRepository.CreateAsync(anonymousCart, cancellationToken))
+            if (!await cartRepository.CreateAnonymousAsync(anonymousCart, cancellationToken))
                 throw new InvalidOperationException("Anonymous cart could not be created.");
 
             return anonymousCart;
         }
 
-        var existingCartId = await cartRepository.GetCustomerCartIdAsync(customerId.Value, cancellationToken);
-
-        if (existingCartId.HasValue)
-        {
-            var existingCart = await cartRepository.GetAsync(existingCartId.Value, cancellationToken);
-
-            if (existingCart is not null) return existingCart;
-        }
-
         for (var attempt = 1; attempt <= MaxConcurrencyRetries; attempt++)
         {
-            var cart = new ShoppingCart(Guid.NewGuid(), customerId);
-
-            if (await cartRepository.TryCreateCustomerCartAsync(cart, cancellationToken)) return cart;
-
-            existingCartId = await cartRepository.GetCustomerCartIdAsync(customerId.Value, cancellationToken);
+            var existingCartId = await cartRepository.GetCustomerCartIdAsync(customerId.Value, cancellationToken);
 
             if (existingCartId.HasValue)
             {
                 var existingCart = await cartRepository.GetAsync(existingCartId.Value, cancellationToken);
 
                 if (existingCart is not null) return existingCart;
+
+                _ = await cartRepository.TryRemoveCustomerCartIndexAsync(customerId.Value, existingCartId.Value, cancellationToken);
+                continue;
             }
+
+            var cart = new ShoppingCart(Guid.NewGuid(), customerId);
+
+            if (await cartRepository.TryCreateCustomerCartAsync(cart, cancellationToken)) return cart;
         }
 
         throw new CartConflictException($"Active cart for customer '{customerId}' could not be created.");
@@ -68,21 +62,25 @@ public sealed class CartApplicationService(ICartRepository cartRepository)
             var current = await cartRepository.GetVersionedAsync(cartId, cancellationToken);
 
             if (current is null) return null;
-
             if (current.Cart.CustomerId == customerId) return current.Cart;
-
-            if (current.Cart.CustomerId.HasValue)
-                throw new CartConflictException("Cart is already assigned to another customer.");
+            if (current.Cart.CustomerId.HasValue) throw new CartConflictException("Cart is already assigned to another customer.");
 
             var existingCustomerCartId = await cartRepository.GetCustomerCartIdAsync(customerId, cancellationToken);
 
             if (existingCustomerCartId.HasValue && existingCustomerCartId.Value != cartId)
-                throw new CartConflictException("Customer already has another active cart.");
+            {
+                var existingCustomerCart = await cartRepository.GetAsync(existingCustomerCartId.Value, cancellationToken);
+
+                if (existingCustomerCart is not null)
+                    throw new CartConflictException("Customer already has another active cart.");
+
+                _ = await cartRepository.TryRemoveCustomerCartIndexAsync(customerId, existingCustomerCartId.Value, cancellationToken);
+                continue;
+            }
 
             current.Cart.AssignCustomer(customerId);
 
-            if (await cartRepository.TryAssignCustomerAsync(current.Cart, current.Version, cancellationToken))
-                return current.Cart;
+            if (await cartRepository.TryAssignCustomerAsync(current.Cart, current.Version, cancellationToken)) return current.Cart;
         }
 
         throw new CartConflictException($"Cart '{cartId}' could not be assigned because of repeated concurrent modifications.");
