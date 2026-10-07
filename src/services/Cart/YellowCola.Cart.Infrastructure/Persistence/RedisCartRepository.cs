@@ -280,7 +280,7 @@ internal sealed class RedisCartRepository(IConnectionMultiplexer connectionMulti
 
         return await transaction.ExecuteAsync();
     }
-
+#pragma warning restore SER301
     private static RedisKey GetKey(Guid cartId) => $"{KeyPrefix}{cartId:N}";
 
     private static void ValidateCartId(Guid cartId)
