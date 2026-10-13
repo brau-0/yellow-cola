@@ -22,6 +22,8 @@ public static class CatalogEndpoints
             "/products/{slug}",
             GetProductBySlugAsync);
 
+        group.MapGet("/skus", GetSkusByIdsAsync);
+
         return endpoints;
     }
 
@@ -102,5 +104,18 @@ public static class CatalogEndpoints
         return product is null
             ? Results.NotFound()
             : Results.Ok(product);
+    }
+
+    private static async Task<IResult> GetSkusByIdsAsync(Guid[] ids, ICatalogQueries queries, CancellationToken cancellationToken)
+    {
+        if (ids.Length == 0) return Results.BadRequest(new { error = "At least one SKU id is required." });
+
+        var distinctIds = ids.Distinct().ToArray();
+
+        if (distinctIds.Length > 100) return Results.BadRequest(new { error = "A maximum of 100 SKU ids can be requested." });
+
+        var items = await queries.GetSkusByIdsAsync(distinctIds, cancellationToken);
+
+        return Results.Ok(items);
     }
 }

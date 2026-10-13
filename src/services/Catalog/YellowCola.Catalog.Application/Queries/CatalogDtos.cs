@@ -16,6 +16,7 @@
     int SkuCount);
 
     public sealed record SkuDto(
+        Guid Id,
         string Code,
         string Flavor,
         int VolumeMl,
@@ -24,7 +25,6 @@
         string PackLabel,
         decimal Price,
         string Currency);
-
     public sealed record ProductDetailDto(
         string Code,
         string Brand,
@@ -37,6 +37,7 @@
         string PrimaryImageKey,
         IReadOnlyCollection<SkuDto> Skus);
 
+    public sealed record SkuLookupDto(Guid Id, string Code, string Description, decimal Price, string Currency, bool IsActive);
     public sealed record PagedResult<T>(
         IReadOnlyCollection<T> Items,
         int Page,

@@ -15,4 +15,8 @@ public interface ICatalogQueries
         GetProductBySlugAsync(
             string slug,
             CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyCollection<SkuLookupDto>> GetSkusByIdsAsync(
+        IReadOnlyCollection<Guid> skuIds
+        , CancellationToken cancellationToken = default);
 }

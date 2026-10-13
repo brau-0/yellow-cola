@@ -147,17 +147,40 @@ internal sealed class CatalogQueries(
                     .ThenBy(sku => sku.UnitsPerPack)
                     .Select(sku =>
                         new SkuDto(
-                            sku.Code,
-                            sku.Flavor,
-                            sku.UnitSizeMl,
-                            sku.PackageType,
-                            sku.UnitsPerPack,
-                            sku.PackLabel,
-                            sku.Price,
-                            sku.Currency))
+    sku.Id,
+    sku.Code,
+    sku.Flavor,
+    sku.UnitSizeMl,
+    sku.PackageType,
+    sku.UnitsPerPack,
+    sku.PackLabel,
+    sku.Price,
+    sku.Currency))
                     .ToList());
 
         return await query.SingleOrDefaultAsync(
             cancellationToken);
+    }
+
+    public async Task<IReadOnlyCollection<SkuLookupDto>> GetSkusByIdsAsync(IReadOnlyCollection<Guid> skuIds
+        , CancellationToken cancellationToken = default)
+    {
+        if (skuIds.Count == 0) return [];
+
+        var ids = skuIds.Distinct().ToArray();
+
+        var query =
+            from sku in dbContext.Skus.AsNoTracking()
+            join product in dbContext.Products.AsNoTracking() on sku.ProductId equals product.Id
+            where ids.Contains(sku.Id)
+            select new SkuLookupDto(
+                sku.Id,
+                sku.Code,
+                product.Name + " - " + sku.PackLabel,
+                sku.Price,
+                sku.Currency,
+                product.IsActive && sku.IsActive);
+
+        return await query.ToListAsync(cancellationToken);
     }
 }
