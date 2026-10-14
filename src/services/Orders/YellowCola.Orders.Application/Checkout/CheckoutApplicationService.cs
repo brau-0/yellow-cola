@@ -1,12 +1,17 @@
 ﻿using YellowCola.Orders.Application.Orders;
 using YellowCola.Orders.Application.Persistence;
+using YellowCola.Orders.Domain.Checkout;
 using YellowCola.Orders.Domain.Orders;
 
 namespace YellowCola.Orders.Application.Checkout;
 
-public sealed class CheckoutApplicationService(ICheckoutCartReader cartReader, ICheckoutCatalogReader catalogReader
-    , ICheckoutCustomerReader customerReader, IOrderRepository orderRepository
-    , IOrdersUnitOfWork unitOfWork)
+public sealed class CheckoutApplicationService(
+    ICheckoutCartReader cartReader,
+    ICheckoutCatalogReader catalogReader,
+    ICheckoutCustomerReader customerReader,
+    IOrderRepository orderRepository,
+    ICheckoutSagaRepository sagaRepository,
+    IOrdersUnitOfWork unitOfWork)
 {
     public async Task<CheckoutResult> CheckoutAsync(CheckoutRequest request, CancellationToken cancellationToken = default)
     {
@@ -46,9 +51,13 @@ public sealed class CheckoutApplicationService(ICheckoutCartReader cartReader, I
 
         var shippingAddress = new ShippingAddressSnapshot(address.Id, address.RecipientName, address.PostalCode, address.State, address.Municipality, address.Neighborhood, address.Street, address.ExteriorNumber, address.InteriorNumber, address.Reference);
 
-        var order = new Order(Guid.NewGuid(), request.CustomerId, shippingAddress, lines, DateTimeOffset.UtcNow);
+        var now = DateTimeOffset.UtcNow;
+        var order = new Order(Guid.NewGuid(), request.CustomerId, shippingAddress, lines, now);
+        var saga = new CheckoutSaga(Guid.NewGuid(), order.Id, request.CartId, request.CustomerId, now);
 
         await orderRepository.AddAsync(order, cancellationToken);
+        await sagaRepository.AddAsync(saga, cancellationToken);
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return new CheckoutResult(order);

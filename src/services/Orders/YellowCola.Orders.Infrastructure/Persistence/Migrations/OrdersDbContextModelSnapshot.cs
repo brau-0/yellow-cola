@@ -22,6 +22,60 @@ namespace YellowCola.Orders.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("YellowCola.Orders.Domain.Checkout.CheckoutSaga", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("CartId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("cart_id");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("customer_id");
+
+                    b.Property<string>("FailureReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("failure_reason");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("order_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("status");
+
+                    b.Property<DateTimeOffset>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at_utc");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_checkout_sagas_order_id");
+
+                    b.HasIndex("Status", "UpdatedAtUtc")
+                        .HasDatabaseName("IX_checkout_sagas_status_updated_at");
+
+                    b.ToTable("checkout_sagas", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_checkout_sagas_status", "\"status\" IN ('Started', 'InventoryReservationPending', 'InventoryReserved', 'PaymentAuthorizationPending', 'PaymentAuthorized', 'InventoryReleasePending', 'Completed', 'Failed')");
+
+                            t.HasCheckConstraint("CK_checkout_sagas_updated_after_created", "\"updated_at_utc\" >= \"created_at_utc\"");
+                        });
+                });
+
             modelBuilder.Entity("YellowCola.Orders.Domain.Orders.Order", b =>
                 {
                     b.Property<Guid>("Id")
@@ -54,6 +108,15 @@ namespace YellowCola.Orders.Infrastructure.Persistence.Migrations
                         {
                             t.HasCheckConstraint("CK_orders_status", "\"status\" IN ('Pending', 'Confirmed', 'Cancelled')");
                         });
+                });
+
+            modelBuilder.Entity("YellowCola.Orders.Domain.Checkout.CheckoutSaga", b =>
+                {
+                    b.HasOne("YellowCola.Orders.Domain.Orders.Order", null)
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("YellowCola.Orders.Domain.Orders.Order", b =>

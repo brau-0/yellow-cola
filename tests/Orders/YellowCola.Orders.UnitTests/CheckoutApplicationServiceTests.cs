@@ -1,6 +1,7 @@
 ﻿using YellowCola.Orders.Application.Checkout;
 using YellowCola.Orders.Application.Orders;
 using YellowCola.Orders.Application.Persistence;
+using YellowCola.Orders.Domain.Checkout;
 using YellowCola.Orders.Domain.Orders;
 
 namespace YellowCola.Orders.UnitTests;
@@ -20,11 +21,18 @@ public sealed class CheckoutApplicationServiceTests
         var customerReader = new FakeCustomerReader(new CheckoutAddress(addressId, customerId, "Braulio Guzman", "52900", "Estado de México", "Atizapán de Zaragoza", "Centro", "Av. Principal", "100", null, "Casa blanca"));
         var repository = new FakeOrderRepository();
         var unitOfWork = new FakeUnitOfWork();
+        var sagaRepository = new FakeCheckoutSagaRepository();
 
-        var service = new CheckoutApplicationService(cartReader, catalogReader, customerReader, repository, unitOfWork);
+        var service = new CheckoutApplicationService(cartReader, catalogReader, customerReader, repository, sagaRepository, unitOfWork);
 
         var result = await service.CheckoutAsync(new CheckoutRequest(cartId, customerId, addressId));
 
+        Assert.NotNull(sagaRepository.AddedSaga);
+        Assert.Equal(result.Order.Id, sagaRepository.AddedSaga.OrderId);
+        Assert.Equal(cartId, sagaRepository.AddedSaga.CartId);
+        Assert.Equal(customerId, sagaRepository.AddedSaga.CustomerId);
+        Assert.Equal(CheckoutSagaStatus.Started, sagaRepository.AddedSaga.Status);
+        Assert.Equal(1, unitOfWork.SaveChangesCalls);
         Assert.Equal(customerId, result.Order.CustomerId);
         Assert.Equal(OrderStatus.Pending, result.Order.Status);
         Assert.Equal(259.80m, result.Order.TotalAmount);
@@ -46,7 +54,8 @@ public sealed class CheckoutApplicationServiceTests
         var cartId = Guid.NewGuid();
         var customerId = Guid.NewGuid();
         var cartReader = new FakeCartReader(new CheckoutCart(cartId, null, [new CheckoutCartItem(Guid.NewGuid(), 1)]));
-        var service = new CheckoutApplicationService(cartReader, new FakeCatalogReader([]), new FakeCustomerReader(null), new FakeOrderRepository(), new FakeUnitOfWork());
+        var service = new CheckoutApplicationService(cartReader, new FakeCatalogReader([]), new FakeCustomerReader(null)
+            , new FakeOrderRepository(), new FakeCheckoutSagaRepository(), new FakeUnitOfWork());
 
         await Assert.ThrowsAsync<CheckoutException>(() => service.CheckoutAsync(new CheckoutRequest(cartId, customerId, Guid.NewGuid())));
     }
@@ -55,7 +64,8 @@ public sealed class CheckoutApplicationServiceTests
     {
         var cartId = Guid.NewGuid();
         var cartReader = new FakeCartReader(new CheckoutCart(cartId, Guid.NewGuid(), [new CheckoutCartItem(Guid.NewGuid(), 1)]));
-        var service = new CheckoutApplicationService(cartReader, new FakeCatalogReader([]), new FakeCustomerReader(null), new FakeOrderRepository(), new FakeUnitOfWork());
+        var service = new CheckoutApplicationService(cartReader, new FakeCatalogReader([]), new FakeCustomerReader(null)
+            , new FakeOrderRepository(), new FakeCheckoutSagaRepository(), new FakeUnitOfWork());
 
         await Assert.ThrowsAsync<CheckoutException>(() => service.CheckoutAsync(new CheckoutRequest(cartId, Guid.NewGuid(), Guid.NewGuid())));
     }
@@ -83,17 +93,19 @@ public sealed class CheckoutApplicationServiceTests
 
         public Task<Order?> GetByIdAsync(Guid orderId, CancellationToken cancellationToken = default) => Task.FromResult<Order?>(null);
     }
-    private static CheckoutApplicationService CreateService(CheckoutCart? cart = null, IReadOnlyCollection<CheckoutCatalogItem>? catalogItems = null, CheckoutAddress? address = null, FakeOrderRepository? repository = null, FakeUnitOfWork? unitOfWork = null)
+    private static CheckoutApplicationService CreateService(
+     CheckoutCart? cart = null,
+     IReadOnlyCollection<CheckoutCatalogItem>? catalogItems = null,
+     CheckoutAddress? address = null,
+     FakeOrderRepository? repository = null,
+     FakeCheckoutSagaRepository? sagaRepository = null,
+     FakeUnitOfWork? unitOfWork = null)
     {
         repository ??= new FakeOrderRepository();
+        sagaRepository ??= new FakeCheckoutSagaRepository();
         unitOfWork ??= new FakeUnitOfWork();
 
-        return new CheckoutApplicationService(
-            new FakeCartReader(cart),
-            new FakeCatalogReader(catalogItems ?? Array.Empty<CheckoutCatalogItem>()),
-            new FakeCustomerReader(address),
-            repository,
-            unitOfWork);
+        return new CheckoutApplicationService(new FakeCartReader(cart), new FakeCatalogReader(catalogItems ?? []), new FakeCustomerReader(address), repository, sagaRepository, unitOfWork);
     }
     private sealed class FakeUnitOfWork : IOrdersUnitOfWork
     {
@@ -104,5 +116,19 @@ public sealed class CheckoutApplicationServiceTests
             SaveChangesCalls++;
             return Task.CompletedTask;
         }
+    }
+    private sealed class FakeCheckoutSagaRepository : ICheckoutSagaRepository
+    {
+        public CheckoutSaga? AddedSaga { get; private set; }
+
+        public Task AddAsync(CheckoutSaga saga, CancellationToken cancellationToken = default)
+        {
+            AddedSaga = saga;
+            return Task.CompletedTask;
+        }
+
+        public Task<CheckoutSaga?> GetByIdAsync(Guid sagaId, CancellationToken cancellationToken = default) => Task.FromResult<CheckoutSaga?>(null);
+
+        public Task<CheckoutSaga?> GetByOrderIdAsync(Guid orderId, CancellationToken cancellationToken = default) => Task.FromResult<CheckoutSaga?>(null);
     }
 }
