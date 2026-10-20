@@ -9,5 +9,6 @@ public sealed class OrdersWebApplicationFactory(string connectionString) : WebAp
     {
         builder.UseEnvironment("IntegrationTesting");
         builder.UseSetting("ConnectionStrings:OrdersDatabase", connectionString);
+        builder.UseSetting("OutboxPublisher:Enabled", "false");
     }
 }

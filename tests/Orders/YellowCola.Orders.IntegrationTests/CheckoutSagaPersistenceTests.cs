@@ -5,7 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Testcontainers.PostgreSql;
 
+using YellowCola.Checkout.Contracts.Inventory;
 using YellowCola.Orders.Application.Checkout;
+using YellowCola.Orders.Application.Messaging;
 using YellowCola.Orders.Application.Orders;
 using YellowCola.Orders.Application.Persistence;
 using YellowCola.Orders.Domain.Checkout;
@@ -118,6 +120,51 @@ public sealed class CheckoutSagaPersistenceTests : IAsyncLifetime
             Assert.NotNull(restored);
             Assert.Equal(CheckoutSagaStatus.InventoryReservationPending, restored.Status);
         }
+    }
+    [Fact]
+    public async Task OrderSagaAndOutboxShouldBePersistedTogether()
+    {
+        ArgumentNullException.ThrowIfNull(_factory);
+
+        var order = CreateOrder();
+        var saga = new CheckoutSaga(Guid.NewGuid(), order.Id, Guid.NewGuid(), order.CustomerId, order.CreatedAtUtc);
+
+        saga.MarkInventoryReservationPending(order.CreatedAtUtc);
+
+        var command = new ReserveInventoryCommand(
+            Guid.NewGuid(),
+            saga.Id,
+            null,
+            order.CreatedAtUtc,
+            order.Id,
+            "WH-MX-01",
+            order.Lines.Select(line => new ReserveInventoryLine(line.SkuId, line.Quantity)).ToArray());
+
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var orderRepository = scope.ServiceProvider.GetRequiredService<IOrderRepository>();
+            var sagaRepository = scope.ServiceProvider.GetRequiredService<ICheckoutSagaRepository>();
+            var outboxWriter = scope.ServiceProvider.GetRequiredService<IOutboxWriter>();
+            var unitOfWork = scope.ServiceProvider.GetRequiredService<IOrdersUnitOfWork>();
+
+            await orderRepository.AddAsync(order);
+            await sagaRepository.AddAsync(saga);
+            outboxWriter.Add(command);
+
+            await unitOfWork.SaveChangesAsync();
+        }
+
+        using var verificationScope = _factory.Services.CreateScope();
+
+        var orderRepositoryVerification = verificationScope.ServiceProvider.GetRequiredService<IOrderRepository>();
+        var sagaRepositoryVerification = verificationScope.ServiceProvider.GetRequiredService<ICheckoutSagaRepository>();
+
+        var restoredOrder = await orderRepositoryVerification.GetByIdAsync(order.Id);
+        var restoredSaga = await sagaRepositoryVerification.GetByIdAsync(saga.Id);
+
+        Assert.NotNull(restoredOrder);
+        Assert.NotNull(restoredSaga);
+        Assert.Equal(CheckoutSagaStatus.InventoryReservationPending, restoredSaga.Status);
     }
     private static Order CreateOrder()
     {

@@ -1,4 +1,6 @@
-﻿using YellowCola.Orders.Application.Orders;
+﻿using YellowCola.Checkout.Contracts.Inventory;
+using YellowCola.Orders.Application.Messaging;
+using YellowCola.Orders.Application.Orders;
 using YellowCola.Orders.Application.Persistence;
 using YellowCola.Orders.Domain.Checkout;
 using YellowCola.Orders.Domain.Orders;
@@ -11,7 +13,8 @@ public sealed class CheckoutApplicationService(
     ICheckoutCustomerReader customerReader,
     IOrderRepository orderRepository,
     ICheckoutSagaRepository sagaRepository,
-    IOrdersUnitOfWork unitOfWork)
+    IOrdersUnitOfWork unitOfWork,
+    IOutboxWriter outboxWriter)
 {
     public async Task<CheckoutResult> CheckoutAsync(CheckoutRequest request, CancellationToken cancellationToken = default)
     {
@@ -52,11 +55,24 @@ public sealed class CheckoutApplicationService(
         var shippingAddress = new ShippingAddressSnapshot(address.Id, address.RecipientName, address.PostalCode, address.State, address.Municipality, address.Neighborhood, address.Street, address.ExteriorNumber, address.InteriorNumber, address.Reference);
 
         var now = DateTimeOffset.UtcNow;
+
         var order = new Order(Guid.NewGuid(), request.CustomerId, shippingAddress, lines, now);
         var saga = new CheckoutSaga(Guid.NewGuid(), order.Id, request.CartId, request.CustomerId, now);
 
+        saga.MarkInventoryReservationPending(now);
+
+        var command = new ReserveInventoryCommand(
+            Guid.NewGuid(),
+            saga.Id,
+            null,
+            now,
+            order.Id,
+            "WH-MX-01",
+            order.Lines.Select(line => new ReserveInventoryLine(line.SkuId, line.Quantity)).ToArray());
+
         await orderRepository.AddAsync(order, cancellationToken);
         await sagaRepository.AddAsync(saga, cancellationToken);
+        outboxWriter.Add(command);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 

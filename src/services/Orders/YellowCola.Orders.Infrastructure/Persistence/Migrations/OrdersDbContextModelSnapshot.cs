@@ -110,6 +110,70 @@ namespace YellowCola.Orders.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("YellowCola.Orders.Infrastructure.Persistence.Outbox.OutboxMessage", b =>
+                {
+                    b.Property<Guid>("MessageId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("message_id");
+
+                    b.Property<Guid?>("CausationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("causation_id");
+
+                    b.Property<Guid>("CorrelationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("correlation_id");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<string>("LastError")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("last_error");
+
+                    b.Property<string>("MessageType")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("message_type");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("payload");
+
+                    b.Property<int>("PublishAttempts")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("publish_attempts");
+
+                    b.Property<DateTimeOffset?>("PublishedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("published_at_utc");
+
+                    b.Property<int>("SchemaVersion")
+                        .HasColumnType("integer")
+                        .HasColumnName("schema_version");
+
+                    b.HasKey("MessageId");
+
+                    b.HasIndex("CorrelationId")
+                        .HasDatabaseName("IX_outbox_messages_correlation_id");
+
+                    b.HasIndex("PublishedAtUtc", "CreatedAtUtc")
+                        .HasDatabaseName("IX_outbox_messages_published_created");
+
+                    b.ToTable("outbox_messages", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_outbox_messages_publish_attempts_non_negative", "\"publish_attempts\" >= 0");
+
+                            t.HasCheckConstraint("CK_outbox_messages_schema_version_positive", "\"schema_version\" > 0");
+                        });
+                });
+
             modelBuilder.Entity("YellowCola.Orders.Domain.Checkout.CheckoutSaga", b =>
                 {
                     b.HasOne("YellowCola.Orders.Domain.Orders.Order", null)

@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\YellowCola.Orders.Domain\YellowCola.Orders.Domain.csproj" />
+    <ProjectReference Include="..\..\..\contracts\Checkout\YellowCola.Checkout.Contracts\YellowCola.Checkout.Contracts.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

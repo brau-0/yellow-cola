@@ -3,10 +3,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using YellowCola.Orders.Application.Checkout;
+using YellowCola.Orders.Application.Messaging;
 using YellowCola.Orders.Application.Orders;
 using YellowCola.Orders.Application.Persistence;
 using YellowCola.Orders.Infrastructure.Checkout;
+using YellowCola.Orders.Infrastructure.Messaging;
 using YellowCola.Orders.Infrastructure.Persistence;
+using YellowCola.Orders.Infrastructure.Persistence.Outbox;
 using YellowCola.Orders.Infrastructure.Repositories;
 
 namespace YellowCola.Orders.Infrastructure;
@@ -47,6 +50,11 @@ public static class DependencyInjection
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IOrdersUnitOfWork, OrdersUnitOfWork>();
         services.AddScoped<ICheckoutSagaRepository, CheckoutSagaRepository>();
+        services.AddScoped<IOutboxWriter, EfOutboxWriter>();
+
+        services.AddSingleton<IIntegrationMessageTransport, LocalLoggingIntegrationMessageTransport>();
+        services.AddScoped<OutboxPublisherProcessor>();
+        services.AddHostedService<OutboxPublisherHostedService>();
 
         return services;
     }

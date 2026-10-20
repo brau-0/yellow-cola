@@ -1,4 +1,7 @@
-﻿using YellowCola.Orders.Application.Checkout;
+﻿using YellowCola.Checkout.Contracts.Inventory;
+using YellowCola.Checkout.Contracts.Messaging;
+using YellowCola.Orders.Application.Checkout;
+using YellowCola.Orders.Application.Messaging;
 using YellowCola.Orders.Application.Orders;
 using YellowCola.Orders.Application.Persistence;
 using YellowCola.Orders.Domain.Checkout;
@@ -21,24 +24,23 @@ public sealed class CheckoutApplicationServiceTests
         var customerReader = new FakeCustomerReader(new CheckoutAddress(addressId, customerId, "Braulio Guzman", "52900", "Estado de México", "Atizapán de Zaragoza", "Centro", "Av. Principal", "100", null, "Casa blanca"));
         var repository = new FakeOrderRepository();
         var unitOfWork = new FakeUnitOfWork();
+        var outboxWriter = new FakeOutboxWriter();
         var sagaRepository = new FakeCheckoutSagaRepository();
 
-        var service = new CheckoutApplicationService(cartReader, catalogReader, customerReader, repository, sagaRepository, unitOfWork);
+        var service = new CheckoutApplicationService(cartReader, catalogReader, customerReader, repository, sagaRepository, unitOfWork, outboxWriter);
 
         var result = await service.CheckoutAsync(new CheckoutRequest(cartId, customerId, addressId));
 
         Assert.NotNull(sagaRepository.AddedSaga);
-        Assert.Equal(result.Order.Id, sagaRepository.AddedSaga.OrderId);
-        Assert.Equal(cartId, sagaRepository.AddedSaga.CartId);
-        Assert.Equal(customerId, sagaRepository.AddedSaga.CustomerId);
-        Assert.Equal(CheckoutSagaStatus.Started, sagaRepository.AddedSaga.Status);
-        Assert.Equal(1, unitOfWork.SaveChangesCalls);
-        Assert.Equal(customerId, result.Order.CustomerId);
-        Assert.Equal(OrderStatus.Pending, result.Order.Status);
-        Assert.Equal(259.80m, result.Order.TotalAmount);
-        Assert.Equal(129.90m, result.Order.Lines.Single().UnitPrice);
-        Assert.Equal("52900", result.Order.ShippingAddress.PostalCode);
-        Assert.Same(result.Order, repository.AddedOrder);
+        Assert.Equal(CheckoutSagaStatus.InventoryReservationPending, sagaRepository.AddedSaga.Status);
+
+        var command = Assert.IsType<ReserveInventoryCommand>(outboxWriter.AddedMessage);
+
+        Assert.Equal(result.Order.Id, command.OrderId);
+        Assert.Equal(sagaRepository.AddedSaga.Id, command.CorrelationId);
+        Assert.Null(command.CausationId);
+        Assert.Equal("WH-MX-01", command.WarehouseCode);
+        Assert.Equal(result.Order.Lines.Count, command.Lines.Count);
         Assert.Equal(1, unitOfWork.SaveChangesCalls);
     }
     [Fact]
@@ -52,12 +54,16 @@ public sealed class CheckoutApplicationServiceTests
     public async Task CheckoutShouldRejectAnonymousCart()
     {
         var cartId = Guid.NewGuid();
+   
         var customerId = Guid.NewGuid();
+        var outboxWriter = new FakeOutboxWriter();
         var cartReader = new FakeCartReader(new CheckoutCart(cartId, null, [new CheckoutCartItem(Guid.NewGuid(), 1)]));
         var service = new CheckoutApplicationService(cartReader, new FakeCatalogReader([]), new FakeCustomerReader(null)
-            , new FakeOrderRepository(), new FakeCheckoutSagaRepository(), new FakeUnitOfWork());
+            , new FakeOrderRepository(), new FakeCheckoutSagaRepository(), new FakeUnitOfWork(), outboxWriter);
 
         await Assert.ThrowsAsync<CheckoutException>(() => service.CheckoutAsync(new CheckoutRequest(cartId, customerId, Guid.NewGuid())));
+        //
+
     }
     [Fact]
     public async Task CheckoutShouldRejectCartOwnedByAnotherCustomer()
@@ -65,10 +71,11 @@ public sealed class CheckoutApplicationServiceTests
         var cartId = Guid.NewGuid();
         var cartReader = new FakeCartReader(new CheckoutCart(cartId, Guid.NewGuid(), [new CheckoutCartItem(Guid.NewGuid(), 1)]));
         var service = new CheckoutApplicationService(cartReader, new FakeCatalogReader([]), new FakeCustomerReader(null)
-            , new FakeOrderRepository(), new FakeCheckoutSagaRepository(), new FakeUnitOfWork());
+            , new FakeOrderRepository(), new FakeCheckoutSagaRepository(), new FakeUnitOfWork(), new FakeOutboxWriter());
 
         await Assert.ThrowsAsync<CheckoutException>(() => service.CheckoutAsync(new CheckoutRequest(cartId, Guid.NewGuid(), Guid.NewGuid())));
     }
+
     private sealed class FakeCartReader(CheckoutCart? cart) : ICheckoutCartReader
     {
         public Task<CheckoutCart?> GetAsync(Guid cartId, CancellationToken cancellationToken = default) => Task.FromResult(cart);
@@ -99,13 +106,16 @@ public sealed class CheckoutApplicationServiceTests
      CheckoutAddress? address = null,
      FakeOrderRepository? repository = null,
      FakeCheckoutSagaRepository? sagaRepository = null,
-     FakeUnitOfWork? unitOfWork = null)
+     FakeUnitOfWork? unitOfWork = null,
+     FakeOutboxWriter? outboxWriter = null)
     {
         repository ??= new FakeOrderRepository();
         sagaRepository ??= new FakeCheckoutSagaRepository();
         unitOfWork ??= new FakeUnitOfWork();
+        outboxWriter ??= new FakeOutboxWriter();
 
-        return new CheckoutApplicationService(new FakeCartReader(cart), new FakeCatalogReader(catalogItems ?? []), new FakeCustomerReader(address), repository, sagaRepository, unitOfWork);
+        return new CheckoutApplicationService(new FakeCartReader(cart), new FakeCatalogReader(catalogItems ?? [])
+            , new FakeCustomerReader(address), repository, sagaRepository, unitOfWork, outboxWriter);
     }
     private sealed class FakeUnitOfWork : IOrdersUnitOfWork
     {
@@ -130,5 +140,11 @@ public sealed class CheckoutApplicationServiceTests
         public Task<CheckoutSaga?> GetByIdAsync(Guid sagaId, CancellationToken cancellationToken = default) => Task.FromResult<CheckoutSaga?>(null);
 
         public Task<CheckoutSaga?> GetByOrderIdAsync(Guid orderId, CancellationToken cancellationToken = default) => Task.FromResult<CheckoutSaga?>(null);
+    }
+    private sealed class FakeOutboxWriter : IOutboxWriter
+    {
+        public IntegrationMessage? AddedMessage { get; private set; }
+
+        public void Add(IntegrationMessage message) => AddedMessage = message;
     }
 }

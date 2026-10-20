@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/Contracts/" />
+  <Folder Name="/Contracts/Checkout/">
+    <Project Path="src/contracts/Checkout/YellowCola.Checkout.Contracts/YellowCola.Checkout.Contracts.csproj" />
+  </Folder>
   <Folder Name="/Services/" />
   <Folder Name="/Services/Cart/">
     <Project Path="src/services/Cart/YellowCola.Cart.Api/YellowCola.Cart.Api.csproj" />
