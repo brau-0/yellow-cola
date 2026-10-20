@@ -2,6 +2,7 @@
 
 using YellowCola.Inventory.Domain.InventoryItems;
 using YellowCola.Inventory.Domain.Reservations;
+using YellowCola.Inventory.Infrastructure.Persistence.Messaging;
 
 namespace YellowCola.Inventory.Infrastructure.Persistence;
 
@@ -9,6 +10,8 @@ public sealed class InventoryDbContext(
     DbContextOptions<InventoryDbContext> options)
     : DbContext(options)
 {
+    internal DbSet<InboxMessage> InboxMessages => Set<InboxMessage>();
+    internal DbSet<InventoryOutboxMessage> OutboxMessages => Set<InventoryOutboxMessage>();
     public DbSet<InventoryItem> InventoryItems =>
         Set<InventoryItem>();
 

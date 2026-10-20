@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\services\Inventory\YellowCola.Inventory.Api\YellowCola.Inventory.Api.csproj" />
     <ProjectReference Include="..\..\..\src\services\Inventory\YellowCola.Inventory.Infrastructure\YellowCola.Inventory.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\src\contracts\Checkout\YellowCola.Checkout.Contracts\YellowCola.Checkout.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

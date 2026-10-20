@@ -1,11 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
 using YellowCola.Inventory.Application.Inventory;
+using YellowCola.Inventory.Application.Messaging;
 using YellowCola.Inventory.Application.Persistence;
-using YellowCola.Inventory.Infrastructure.Repositories;
 using YellowCola.Inventory.Application.Reservations;
 using YellowCola.Inventory.Infrastructure.Persistence;
+using YellowCola.Inventory.Infrastructure.Persistence.Messaging;
+using YellowCola.Inventory.Infrastructure.Repositories;
 
 namespace YellowCola.Inventory.Infrastructure;
 
@@ -35,6 +38,9 @@ public static class DependencyInjection
 
         services.AddScoped< IInventoryUnitOfWork,InventoryUnitOfWork>();
         services.AddScoped< IInventoryReservationRepository, InventoryReservationRepository>();
+        services.AddScoped<IInboxStore, EfInboxStore>();
+        services.AddScoped<IInventoryOutboxWriter, EfInventoryOutboxWriter>();
+
 
         return services;
     }
