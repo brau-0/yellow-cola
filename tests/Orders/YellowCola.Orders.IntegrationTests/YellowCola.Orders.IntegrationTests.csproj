@@ -17,13 +17,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="Xunit" />
+    <ProjectReference Include="..\..\..\src\services\Orders\YellowCola.Orders.Infrastructure\YellowCola.Orders.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\services\Orders\YellowCola.Orders.Application\YellowCola.Orders.Application.csproj" />
-    <ProjectReference Include="..\..\..\src\services\Orders\YellowCola.Orders.Infrastructure\YellowCola.Orders.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\..\src\services\Orders\YellowCola.Orders.Api\YellowCola.Orders.Api.csproj" />
+    <Using Include="Xunit" />
   </ItemGroup>
 
 </Project>

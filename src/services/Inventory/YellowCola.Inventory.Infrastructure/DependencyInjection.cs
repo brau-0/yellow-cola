@@ -6,6 +6,7 @@ using YellowCola.Inventory.Application.Inventory;
 using YellowCola.Inventory.Application.Messaging;
 using YellowCola.Inventory.Application.Persistence;
 using YellowCola.Inventory.Application.Reservations;
+using YellowCola.Inventory.Infrastructure.Messaging;
 using YellowCola.Inventory.Infrastructure.Persistence;
 using YellowCola.Inventory.Infrastructure.Persistence.Messaging;
 using YellowCola.Inventory.Infrastructure.Repositories;
@@ -40,7 +41,7 @@ public static class DependencyInjection
         services.AddScoped< IInventoryReservationRepository, InventoryReservationRepository>();
         services.AddScoped<IInboxStore, EfInboxStore>();
         services.AddScoped<IInventoryOutboxWriter, EfInventoryOutboxWriter>();
-
+        services.AddHostedService<AzureServiceBusReserveInventoryConsumer>();
 
         return services;
     }

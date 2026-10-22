@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Azure.Messaging.ServiceBus;
+
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -52,7 +54,40 @@ public static class DependencyInjection
         services.AddScoped<ICheckoutSagaRepository, CheckoutSagaRepository>();
         services.AddScoped<IOutboxWriter, EfOutboxWriter>();
 
-        services.AddSingleton<IIntegrationMessageTransport, LocalLoggingIntegrationMessageTransport>();
+        //services.AddSingleton<IIntegrationMessageTransport, LocalLoggingIntegrationMessageTransport>();
+
+        services.AddSingleton<LocalLoggingIntegrationMessageTransport>();
+        services.AddSingleton<AzureServiceBusIntegrationMessageTransport>();
+
+        services.AddSingleton<ServiceBusClient>(serviceProvider =>
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            var connectionString = configuration["Messaging:ServiceBus:ConnectionString"] ?? throw new InvalidOperationException("Service Bus connection string was not configured.");
+
+            return new ServiceBusClient(connectionString);
+        });
+
+        services.AddSingleton<ServiceBusSender>(serviceProvider =>
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            var queueName = configuration["Messaging:ServiceBus:InventoryCommandsQueue"] ?? throw new InvalidOperationException("Inventory commands queue was not configured.");
+
+            return serviceProvider.GetRequiredService<ServiceBusClient>().CreateSender(queueName);
+        });
+
+        services.AddSingleton<IIntegrationMessageTransport>(serviceProvider =>
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            var transport = configuration["Messaging:Transport"] ?? "Local";
+
+            return transport switch
+            {
+                "Local" => serviceProvider.GetRequiredService<LocalLoggingIntegrationMessageTransport>(),
+                "AzureServiceBus" => serviceProvider.GetRequiredService<AzureServiceBusIntegrationMessageTransport>(),
+                _ => throw new InvalidOperationException($"Unsupported messaging transport '{transport}'.")
+            };
+        });
+
         services.AddScoped<OutboxPublisherProcessor>();
         services.AddHostedService<OutboxPublisherHostedService>();
 
